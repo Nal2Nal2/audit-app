@@ -54,6 +54,9 @@ public class AuditWidget extends AppWidgetProvider {
         rv.setOnClickPendingIntent(R.id.widget_root, pi);
 
         String raw = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY, null);
+        int alpha = 100;
+        try { if (raw != null) alpha = new JSONObject(raw).optInt("alpha", 100); } catch (Exception ignored) { }
+        rv.setInt(R.id.bg, "setImageAlpha", Math.round(Math.max(0, Math.min(100, alpha)) * 2.55f));
         if (raw == null) {
             rv.setTextViewText(R.id.title, "기말감사");
             rv.setTextViewText(R.id.sub, "");
