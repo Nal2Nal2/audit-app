@@ -8,6 +8,7 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         // 웹 화면이 위젯에 요약을 넘겨줄 수 있게 연결해요
         registerPlugin(WidgetBridgePlugin.class);
+        registerPlugin(SystemFontPlugin.class);
         super.onCreate(savedInstanceState);
     }
 

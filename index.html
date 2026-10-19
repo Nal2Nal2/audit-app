@@ -1158,7 +1158,26 @@ $('exportBtn').onclick=async()=>{
 render();
 initStore();
 setupWidgetSetting();
+loadSystemFont();
 })();
+/* 안드로이드 앱: 웹 화면은 폰 글꼴 설정을 안 따라가서, 폰에 있는 기본 글꼴 파일을 직접 불러와 써요 */
+async function loadSystemFont(){
+  const Cap=window.Capacitor; if(!(Cap&&Cap.isNativePlatform&&Cap.isNativePlatform()))return;
+  const P=Cap.Plugins&&Cap.Plugins.SystemFont; if(!P||!window.FontFace)return;
+  try{
+    const {fonts}=await P.list(); if(!fonts||!fonts.length)return;
+    const names={latin:'AppSysLatin',ko:'AppSysKo'}, got={};
+    await Promise.all(fonts.map(async f=>{
+      try{
+        const buf=await (await fetch(Cap.convertFileSrc('file://'+f.path))).arrayBuffer();
+        const face=new FontFace(names[f.group],buf,{weight:String(f.weight||400)});
+        await face.load(); document.fonts.add(face); got[f.group]=true;
+      }catch(e){}
+    }));
+    const stack=[got.latin?"'AppSysLatin'":'',got.ko?"'AppSysKo'":'','sans-serif'].filter(Boolean).join(',');
+    if(got.latin||got.ko){document.documentElement.style.setProperty('--f-body',stack);document.documentElement.style.setProperty('--f-mono',stack)}
+  }catch(e){}
+}
 if('serviceWorker' in navigator&&!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform())){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
 </script>
 </body>
