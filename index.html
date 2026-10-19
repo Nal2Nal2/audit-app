@@ -25,8 +25,8 @@ body{margin:0;-webkit-tap-highlight-color:transparent}
   --bg:#f1f2ee; --surface:#ffffff; --ink:#18221f; --muted:#66706b; --line:#d9ddd5; --soft:#e9ece5;
   --accent:#1f5f4f; --accent-ink:#ffffff; --accent-soft:#e1eee9;
   --ok:#2f7d4f; --ok-soft:#e2f1e7; --warn:#b26b00; --warn-soft:#fbefd9; --prog:#2d5fb8; --prog-soft:#e3ebf9; --danger:#c0392b;
-  --f-body:system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
-  --f-mono:system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+  --f-body:"SamsungOneUI","SamsungOneUIKorean","SamsungOne","One UI Sans",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-mono:var(--f-body);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#111614; --surface:#19201d; --ink:#e4ebe7; --muted:#97a39d; --line:#2b3531; --soft:#222b27;
@@ -276,7 +276,7 @@ h1{font-size:22px;font-weight:700;margin:0;letter-spacing:-.01em}
       <label class="wrow" for="wAlpha"><span>배경 투명도</span><input type="range" id="wAlpha" min="0" max="100" step="5"><b id="wAlphaTxt" class="mono"></b></label>
       <div class="wprev" aria-hidden="true"><div class="wprev-card" id="wPrev">기말감사 · 위젯 배경</div></div>
       <div class="wrow"><span>글자색</span><div class="seg small" id="wText"><button type="button" data-v="0">자동</button><button type="button" data-v="1">흰색</button><button type="button" data-v="2">검정</button></div></div>
-      <p class="fine">0%는 불투명, 100%는 완전히 투명해요. 투명도가 50% 이상이면 글자가 흰색이나 검정으로 바뀌어요. '자동'은 배경화면 색을 보고 골라요. Sign-off 칸은 자기 배경이 있어서 그대로예요.</p>
+      <p class="fine">0%는 불투명, 100%는 완전히 투명해요. 투명도가 50% 이상이면 글자가 흰색이나 검정으로 바뀌어요. '자동'은 배경화면 색을 보고 골라요.</p>
     </div>
     <h3>엑셀 · 백업</h3>
     <div class="backup" id="backupNote"></div>
@@ -428,7 +428,7 @@ function render(){
   try{cur&&localStorage.setItem(UI_KEY,cur)}catch(e){}
   renderYears();
   $('views').hidden=!cur;
-  $('views').querySelectorAll('button').forEach(b=>{b.setAttribute('aria-pressed',b.dataset.v===view);b.onclick=()=>{view=b.dataset.v;try{localStorage.setItem('audit-ui-view',view)}catch(e){};renderMain();$('views').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===view))}});
+  $('views').querySelectorAll('button').forEach(b=>{b.setAttribute('aria-pressed',b.dataset.v===view);b.onclick=()=>{view=b.dataset.v;if(view==='cal')calView=null;try{localStorage.setItem('audit-ui-view',view)}catch(e){};renderMain();$('views').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===view))}});
   renderMain();
   $('delYearBtn').hidden=!cur; $('resetYearBtn').hidden=!cur;
   renderBackup();
@@ -733,11 +733,8 @@ function calEvents(comps){
 }
 function renderCalendar(m,comps){
   if(!calView){
-    // 처음엔 오늘 달, 이번 연도에 일정이 없으면 첫 일정이 있는 달
-    const ev0=calEvents(comps), ks=Object.keys(ev0).sort();
+    // 달력은 항상 오늘이 있는 달부터 보여줘요
     const t=parseKey(todayKey); calView={y:t.getFullYear(),m:t.getMonth()+1};
-    const ym=`${calView.y}-${pad(calView.m)}`;
-    if(ks.length&&!ks.some(k=>k.startsWith(ym))){const f=ks.find(k=>k>=todayKey)||ks[0];const d=parseKey(f);calView={y:d.getFullYear(),m:d.getMonth()+1}}
   }
   const ev=calEvents(comps);
   const {y,m:mo}=calView;
