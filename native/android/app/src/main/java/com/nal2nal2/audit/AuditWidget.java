@@ -1,6 +1,11 @@
 package com.nal2nal2.audit;
 
 import android.app.PendingIntent;
+import android.app.WallpaperColors;
+import android.app.WallpaperManager;
+import android.content.res.Configuration;
+import android.graphics.Color;
+import android.os.Build;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
@@ -57,6 +62,17 @@ public class AuditWidget extends AppWidgetProvider {
         int alpha = 100;
         try { if (raw != null) alpha = new JSONObject(raw).optInt("alpha", 100); } catch (Exception ignored) { }
         rv.setInt(R.id.bg, "setImageAlpha", Math.round(Math.max(0, Math.min(100, alpha)) * 2.55f));
+        // 배경이 절반 이상 투명하면 글자를 배경화면에 맞춰 흰색/검정으로 바꿔요
+        if (alpha <= 50) {
+            int mode = 0;
+            try { if (raw != null) mode = new JSONObject(raw).optInt("textMode", 0); } catch (Exception ignored) { }
+            boolean white = mode == 1 || (mode == 0 && wallpaperIsDark(ctx));
+            int ink = white ? 0xFFFFFFFF : 0xFF111111;
+            int muted = white ? 0xD9FFFFFF : 0xBF111111;
+            rv.setTextColor(R.id.title, ink);
+            rv.setTextColor(R.id.sub, muted);
+            for (int[] c : CELL_IDS) { rv.setTextColor(c[0], muted); rv.setTextColor(c[1], ink); }
+        }
         if (raw == null) {
             rv.setTextViewText(R.id.title, "기말감사");
             rv.setTextViewText(R.id.sub, "");
@@ -125,6 +141,24 @@ public class AuditWidget extends AppWidgetProvider {
             rv.setTextViewText(R.id.ok_text, "앱을 한 번 열어 주세요");
         }
         return rv;
+    }
+
+    private static boolean wallpaperIsDark(Context ctx) {
+        try {
+            if (Build.VERSION.SDK_INT >= 27) {
+                WallpaperColors wc = WallpaperManager.getInstance(ctx).getWallpaperColors(WallpaperManager.FLAG_SYSTEM);
+                if (wc != null) {
+                    if (Build.VERSION.SDK_INT >= 31) {
+                        return (wc.getColorHints() & WallpaperColors.HINT_SUPPORTS_DARK_TEXT) == 0;
+                    }
+                    Color c = wc.getPrimaryColor();
+                    return c.luminance() < 0.5f;
+                }
+            }
+        } catch (Exception ignored) { }
+        // 배경화면 색을 못 읽으면 다크 모드 여부로 정해요
+        int night = ctx.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        return night == Configuration.UI_MODE_NIGHT_YES;
     }
 
     private static long daysUntil(String key) {

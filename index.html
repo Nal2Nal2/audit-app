@@ -275,7 +275,8 @@ h1{font-size:22px;font-weight:700;margin:0;letter-spacing:-.01em}
       <h3>홈 화면 위젯</h3>
       <label class="wrow" for="wAlpha"><span>배경 투명도</span><input type="range" id="wAlpha" min="0" max="100" step="5"><b id="wAlphaTxt" class="mono"></b></label>
       <div class="wprev" aria-hidden="true"><div class="wprev-card" id="wPrev">기말감사 · 위젯 배경</div></div>
-      <p class="fine">0%는 불투명, 100%는 완전히 투명해요. 글자는 그대로 보여요.</p>
+      <div class="wrow"><span>글자색</span><div class="seg small" id="wText"><button type="button" data-v="0">자동</button><button type="button" data-v="1">흰색</button><button type="button" data-v="2">검정</button></div></div>
+      <p class="fine">0%는 불투명, 100%는 완전히 투명해요. 투명도가 50% 이상이면 글자가 흰색이나 검정으로 바뀌어요. '자동'은 배경화면 색을 보고 골라요. Sign-off 칸은 자기 배경이 있어서 그대로예요.</p>
     </div>
     <h3>엑셀 · 백업</h3>
     <div class="backup" id="backupNote"></div>
@@ -390,7 +391,7 @@ function pushWidget(){
     const inn=arr.filter(c=>c.join==='y'&&own(c)), parents=inn.filter(c=>c.role==='parent');
     const n=f=>inn.filter(f).length;
     const data={fy:y||'',scope:ownerF?`${ownerF} ${ownerScope==='confirm'?'조회서':ownerScope==='report'?'보고서':''}`.trim():'전체',
-      alpha:widgetAlpha(),
+      alpha:widgetAlpha(), textMode:widgetText(),
       cells:[['조회서',n(c=>c.confirm==='done'||c.confirm==='na'),inn.length],['별도',n(c=>c.sep==='done'),inn.length],['연결',parents.filter(c=>c.con==='done').length,parents.length],['Lobby',n(c=>c.signoff),inn.length]],
       pending:inn.filter(c=>!c.signoff&&c.agm).map(c=>({n:c.name,agm:c.agm})),
       updated:new Date().toISOString()};
@@ -631,14 +632,23 @@ function card(c,prev){
   return el;
 }
 
+function widgetText(){let t=0;try{t=Number(localStorage.getItem('audit-widget-text')||0)}catch(e){}return [0,1,2].includes(t)?t:0}
 function widgetAlpha(){let t=0;try{t=Number(localStorage.getItem('audit-widget-trans')||0)}catch(e){}return Math.max(0,Math.min(100,100-t))}
 function setupWidgetSetting(){
   const native=window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform();
   const box=$('widgetSet'); if(!box||!native)return;
   box.hidden=false;
-  const r=$('wAlpha'), show=()=>{const t=Number(r.value);$('wAlphaTxt').textContent=t+'%';$('wPrev').style.opacity=1;$('wPrev').style.background=`color-mix(in srgb,var(--surface) ${100-t}%,transparent)`};
+  const r=$('wAlpha'), seg=$('wText');
+  const show=()=>{
+    const t=Number(r.value), m=widgetText(), pv=$('wPrev');
+    $('wAlphaTxt').textContent=t+'%';
+    pv.style.background=`color-mix(in srgb,var(--surface) ${100-t}%,transparent)`;
+    pv.style.color=t>=50?(m===2?'#111':'#fff'):'';
+    seg.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',Number(b.dataset.v)===m));
+  };
   r.value=100-widgetAlpha(); show();
   r.oninput=()=>{try{localStorage.setItem('audit-widget-trans',r.value)}catch(e){};show();pushWidget()};
+  seg.querySelectorAll('button').forEach(b=>b.onclick=()=>{try{localStorage.setItem('audit-widget-text',b.dataset.v)}catch(e){};show();pushWidget()});
 }
 function renderBackup(){
   const el=$('backupNote'); if(!el)return;
