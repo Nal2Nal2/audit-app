@@ -649,6 +649,17 @@ function setupWidgetSetting(){
   r.value=100-widgetAlpha(); show();
   r.oninput=()=>{try{localStorage.setItem('audit-widget-trans',r.value)}catch(e){};show();pushWidget()};
   seg.querySelectorAll('button').forEach(b=>b.onclick=()=>{try{localStorage.setItem('audit-widget-text',b.dataset.v)}catch(e){};show();pushWidget()});
+  // 안드로이드 뒤로가기: 열린 창 → 달력 → 필터 → 맨 위로 순서로 되돌리고, 그다음에만 앱을 닫아요
+  const CapApp=Capacitor.Plugins&&Capacitor.Plugins.App;
+  if(CapApp&&CapApp.addListener){
+    CapApp.addListener('backButton',()=>{
+      if(!$('scrim').hidden){closeSheet();return}
+      if(view==='cal'){view='list';try{localStorage.setItem('audit-ui-view',view)}catch(e){};render();return}
+      if(flt){flt=null;renderMain();return}
+      if(window.scrollY>200){window.scrollTo({top:0,behavior:'smooth'});return}
+      CapApp.exitApp();
+    });
+  }
 }
 function renderBackup(){
   const el=$('backupNote'); if(!el)return;
