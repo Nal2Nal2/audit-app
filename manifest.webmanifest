@@ -1,0 +1,26 @@
+{
+  "name": "기말 감사 체크",
+  "short_name": "기말감사",
+  "description": "회계연도별 기말 감사 진행 체크",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f1f2ee",
+  "theme_color": "#1f5f4f",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
