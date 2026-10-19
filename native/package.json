@@ -1,0 +1,14 @@
+{
+  "name": "audit-app-native",
+  "private": true,
+  "version": "1.0.0",
+  "description": "기말감사 안드로이드 앱 (Capacitor)",
+  "scripts": {},
+  "dependencies": {
+    "@capacitor/android": "6.2.0",
+    "@capacitor/cli": "6.2.0",
+    "@capacitor/core": "6.2.0",
+    "@capacitor/filesystem": "6.0.3",
+    "@capacitor/share": "6.0.3"
+  }
+}

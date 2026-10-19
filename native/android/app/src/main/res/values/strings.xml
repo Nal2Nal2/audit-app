@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">기말감사</string>
+    <string name="title_activity_main">기말감사</string>
+    <string name="package_name">com.nal2nal2.audit</string>
+    <string name="custom_url_scheme">com.nal2nal2.audit</string>
+    <string name="widget_desc">조회서·별도·연결·Lobby 진행률과 Sign-off 급한 회사</string>
+</resources>

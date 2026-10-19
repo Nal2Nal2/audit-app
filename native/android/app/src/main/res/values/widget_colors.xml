@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="w_bg">#FFFFFFFF</color>
+    <color name="w_ink">#FF18221F</color>
+    <color name="w_muted">#FF66706B</color>
+    <color name="w_accent">#FF1F5F4F</color>
+    <color name="w_track">#FFE9ECE5</color>
+    <color name="w_ok">#FF2F7D4F</color>
+    <color name="w_ok_soft">#FFE2F1E7</color>
+    <color name="w_danger">#FFC0392B</color>
+    <color name="w_danger_soft">#FFFBE9E6</color>
+</resources>

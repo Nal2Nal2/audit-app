@@ -368,6 +368,26 @@ async function initStore(){
 }
 function snapshot(){lastSnapshot=JSON.stringify(state)}
 function commit(msg){store&&store.save(state);render();if(msg)toast(msg)}
+/* 홈 화면 위젯(안드로이드 앱에서만): 지금 연도·담당자 필터 기준 요약을 넘겨줘요 */
+let widgetTimer=null, widgetLast='';
+function pushWidget(){
+  const W=window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform()&&Capacitor.Plugins&&Capacitor.Plugins.WidgetBridge;
+  if(!W)return;
+  clearTimeout(widgetTimer);
+  widgetTimer=setTimeout(()=>{
+    const y=cur; const arr=y?(state.years[y]||[]):[];
+    const own=c=>!ownerF||(ownerScope!=='report'&&c.confirmOwner===ownerF)||(ownerScope!=='confirm'&&c.reportOwner===ownerF);
+    const inn=arr.filter(c=>c.join==='y'&&own(c)), parents=inn.filter(c=>c.role==='parent');
+    const n=f=>inn.filter(f).length;
+    const data={fy:y||'',scope:ownerF?`${ownerF} ${ownerScope==='confirm'?'조회서':ownerScope==='report'?'보고서':''}`.trim():'전체',
+      cells:[['조회서',n(c=>c.confirm==='done'||c.confirm==='na'),inn.length],['별도',n(c=>c.sep==='done'),inn.length],['연결',parents.filter(c=>c.con==='done').length,parents.length],['Lobby',n(c=>c.signoff),inn.length]],
+      pending:inn.filter(c=>!c.signoff&&c.agm).map(c=>({n:c.name,agm:c.agm})),
+      updated:new Date().toISOString()};
+    const j=JSON.stringify(Object.assign({},data,{updated:''}));
+    if(j===widgetLast)return; widgetLast=j;
+    W.update({data:JSON.stringify(data)}).catch(()=>{});
+  },600);
+}
 function toast(msg,undo=true){
   $('toastMsg').textContent=msg; $('toastUndo').hidden=!undo||!lastSnapshot; $('toast').hidden=false;
   clearTimeout(toastTimer); toastTimer=setTimeout(()=>{$('toast').hidden=true},4500);
@@ -416,6 +436,7 @@ function renderYears(){
 }
 
 function renderMain(){
+  setTimeout(pushWidget,0);
   const m=$('main'); m.innerHTML='';
   if(!cur){
     m.innerHTML=`<div class="empty"><h2>아직 회계연도가 없어요</h2><p>쓰던 감사 진행 엑셀을 불러오면 연도별로 바로 정리돼요. 처음부터 시작하려면 위에서 연도를 만들고 회사를 추가하세요.</p><label class="btn primary" for="fileIn">엑셀 불러오기</label></div>`;
@@ -1080,17 +1101,25 @@ $('exportBtn').onclick=async()=>{
   const name=`기말감사_진행현황_${todayKey}.xlsx`, blob=new Blob([buf]);
   const dl=window.claude&&claude.use?await claude.use('downloads').catch(()=>null):null;
   try{
-    if(dl){await dl.save({filename:name,data:blob})}
+    const Cap=window.Capacitor, native=Cap&&Cap.isNativePlatform&&Cap.isNativePlatform();
+    if(native){
+      // 안드로이드 앱: 파일을 만들고 공유 창으로 저장할 곳(드라이브, 카톡 등)을 고르게 해요
+      const {Filesystem,Share}=Cap.Plugins;
+      const b64=XLSX.write(wb,{type:'base64',bookType:'xlsx'});
+      const w=await Filesystem.writeFile({path:name,data:b64,directory:'CACHE'});
+      try{await Share.share({title:name,files:[w.uri]})}catch(err){if(!/cancel/i.test(String(err&&err.message||err)))throw err}
+    }
+    else if(dl){await dl.save({filename:name,data:blob})}
     else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000)}
     try{localStorage.setItem('audit-backup',new Date().toISOString())}catch(_){}
-    renderBackup(); toast('엑셀 파일로 저장했어요 · 내 파일 > 다운로드',false);
+    renderBackup(); toast(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform()?'엑셀 파일을 만들었어요':'엑셀 파일로 저장했어요 · 내 파일 > 다운로드',false);
   }catch(e){if(e&&e.code!=='declined')toast('파일을 저장하지 못했어요',false)}
 };
 
 render();
 initStore();
 })();
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
+if('serviceWorker' in navigator&&!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform())){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
 </script>
 </body>
 </html>

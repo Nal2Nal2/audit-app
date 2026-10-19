@@ -1,0 +1,63 @@
+name: Android APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "xlsx.full.min.js"
+      - "native/**"
+      - ".github/workflows/android.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: 웹앱 파일을 앱 안으로 복사
+        run: |
+          mkdir -p native/www
+          cp index.html xlsx.full.min.js manifest.webmanifest icon-192.png icon-512.png apple-touch-icon.png native/www/
+
+      - name: Capacitor 준비
+        working-directory: native
+        run: |
+          npm ci
+          npx cap sync android
+
+      - name: APK 빌드
+        working-directory: native/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon --stacktrace
+
+      - name: 파일 이름 정리
+        run: cp native/android/app/build/outputs/apk/release/app-release.apk gimal-audit.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gimal-audit-apk
+          path: gimal-audit.apk
+
+      - name: 다운로드 페이지(Releases)에 올리기
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.${{ github.run_number }}
+          name: 기말감사 v1.${{ github.run_number }}
+          body: 폰에서 아래 gimal-audit.apk를 눌러 받아 설치하세요.
+          files: gimal-audit.apk
+          make_latest: true

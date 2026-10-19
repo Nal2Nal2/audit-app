@@ -1,0 +1,6 @@
+{
+  "appId": "com.nal2nal2.audit",
+  "appName": "기말감사",
+  "webDir": "www",
+  "android": { "allowMixedContent": false }
+}
