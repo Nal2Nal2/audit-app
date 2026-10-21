@@ -31,7 +31,7 @@ jobs:
       - name: 웹앱 파일을 앱 안으로 복사
         run: |
           mkdir -p native/www
-          cp index.html xlsx.full.min.js manifest.webmanifest icon-192.png icon-512.png apple-touch-icon.png native/www/
+          cp index.html xlsx.full.min.js firebase-config.js firebase-sync.js manifest.webmanifest icon-192.png icon-512.png apple-touch-icon.png native/www/
 
       - name: Capacitor 준비
         working-directory: native

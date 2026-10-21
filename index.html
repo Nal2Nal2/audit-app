@@ -9,12 +9,18 @@
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <script src="xlsx.full.min.js"></script>
+<script src="firebase-config.js"></script>
 <style>
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0;-webkit-tap-highlight-color:transparent}
 .backup{font-size:13px;background:var(--soft);border-radius:10px;padding:10px 12px}
 .backup.warn{color:var(--danger)}
 .wset{display:flex;flex-direction:column;gap:8px}
+.sync{display:flex;flex-direction:column;gap:8px;background:var(--soft);border-radius:10px;padding:12px}
+.sync .two input{min-width:0}
+.sync .who{font-size:14px;word-break:break-all}
+.sync .err{font-size:13px;color:#c0392b;margin:0}
+.linkbtn{border:0;background:none;padding:0;color:var(--muted);text-decoration:underline;font-size:12px;align-self:flex-start}
 .wrow{display:flex;align-items:center;gap:10px;font-size:14px}
 .wrow input{flex:1;accent-color:var(--accent)}
 .wrow b{min-width:42px;text-align:right;font-size:14px}
@@ -279,6 +285,7 @@ h1{font-size:22px;font-weight:700;margin:0;letter-spacing:-.01em}
       <div class="wrow"><span>글자색</span><div class="seg small" id="wText"><button type="button" data-v="0">자동</button><button type="button" data-v="1">흰색</button><button type="button" data-v="2">검정</button></div></div>
       <p class="fine">0%는 불투명, 100%는 완전히 투명해요. 투명도가 50% 이상이면 글자가 흰색이나 검정으로 바뀌어요. '자동'은 배경화면 색을 보고 골라요.</p>
     </div>
+    <div id="syncSec" hidden><h3>폰 · 컴퓨터 동기화</h3><div class="sync" id="syncBox"></div></div>
     <h3>엑셀 · 백업</h3>
     <div class="backup" id="backupNote"></div>
     <div class="actions">
@@ -351,8 +358,111 @@ const toDoc=s=>({v:1,settings:s.settings,years:s.years});
 function setStatus(t){$('status').textContent=t}
 function useLocal(msg){
   const saved=lsRead(); if(saved)state=fromDoc(saved);
-  store={save:s=>{lsWrite(toDoc(s));setStatus(msg)}};
+  store={save:s=>{lsWrite(toDoc(s));syncLocalChanged();setStatus(SY.user?'저장됨 · 동기화 중…':msg)}};
   setStatus(saved?msg:'아직 기록이 없어요'); render();
+  syncStart();
+}
+
+/* ---------- 폰 · 컴퓨터 동기화 (Firebase) ----------
+   이 기기에 먼저 저장하고, 로그인돼 있으면 내 계정 저장소(users/내ID/audit/state)에도 올려요.
+   다른 기기에서 더 나중에 고친 내용이 오면 그걸로 바꾸고 화면·위젯을 새로 그려요. */
+const SY={user:null,ref:null,unsub:null,timer:null,sending:0,err:'',busy:false,ready:false,lastAt:0};
+const sg=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const ss=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,String(v))}catch(e){}};
+const K={at:'audit-sync-at',local:'audit-local-at',dirty:'audit-sync-dirty',uid:'audit-sync-uid'};
+const hasData=s=>Object.keys(s.years||{}).some(y=>(s.years[y]||[]).length);
+function loadScript(src){return new Promise((res,rej)=>{const e=document.createElement('script');e.src=src;e.onload=res;e.onerror=rej;document.head.appendChild(e)})}
+async function syncStart(){
+  const cfg=window.FIREBASE_CONFIG; if(!cfg)return;
+  $('syncSec').hidden=false; renderSync();
+  try{if(!window.FB)await loadScript('firebase-sync.js')}catch(e){SY.err='인터넷이 연결되면 동기화할 수 있어요';renderSync();window.addEventListener('online',()=>location.reload(),{once:true});return}
+  const F=window.FB, app=F.initializeApp(cfg);
+  SY.F=F; SY.auth=F.initializeAuth(app,{persistence:[F.indexedDBLocalPersistence,F.browserLocalPersistence]}); SY.db=F.getFirestore(app);
+  F.onAuthStateChanged(SY.auth,u=>{SY.user=u;SY.ready=true;if(SY.unsub){SY.unsub();SY.unsub=null}SY.ref=null;if(u)attach();renderSync()});
+  window.addEventListener('online',()=>{if(SY.ref&&sg(K.dirty)==='1')upload()});
+}
+function attach(){
+  const F=SY.F, uidv=SY.user.uid; SY.ref=F.doc(SY.db,'users',uidv,'audit','state');
+  SY.unsub=F.onSnapshot(SY.ref,snap=>{
+    if(snap.metadata.hasPendingWrites)return;
+    SY.err=''; handleRemote(snap.exists()?snap.data():null);
+  },e=>{SY.err=e&&e.code==='permission-denied'?'저장소 규칙 때문에 막혔어요 · Firestore 규칙을 확인해 주세요':'연결이 끊겼어요 · 인터넷이 되면 다시 이어져요';renderSync()});
+}
+function handleRemote(d){
+  const linked=sg(K.uid)===SY.user.uid, syncAt=+sg(K.at)||0, localAt=+sg(K.local)||0, dirty=sg(K.dirty)==='1';
+  if(!d||!d.doc){if(hasData(state))upload(true);else{ss(K.uid,SY.user.uid);renderSync()}return}
+  if(d.at===SY.sending){SY.lastAt=d.at;renderSync();return}   // 방금 내가 올린 것
+  if(!linked){
+    if(!hasData(state)||JSON.stringify(toDoc(state))===d.doc){apply(d);ss(K.uid,SY.user.uid)}
+    else askMerge(d);
+    return;
+  }
+  if(d.at<=syncAt){SY.lastAt=syncAt;if(dirty)upload();else renderSync();return}
+  if(dirty&&localAt>d.at)upload(); else apply(d);
+}
+function apply(d){
+  try{state=fromDoc(JSON.parse(d.doc))}catch(e){return}
+  lsWrite(toDoc(state)); ss(K.at,d.at); ss(K.dirty,null); SY.lastAt=d.at;
+  render(); setStatus('동기화됨 · 내 계정'); renderSync();
+}
+function syncLocalChanged(){
+  ss(K.local,Date.now()); ss(K.dirty,'1');
+  if(SY.ref&&sg(K.uid)===SY.user.uid){clearTimeout(SY.timer);SY.timer=setTimeout(upload,800)}
+}
+async function upload(first){
+  if(!SY.ref)return; clearTimeout(SY.timer);
+  const at=Date.now(); SY.sending=at;
+  try{
+    await SY.F.setDoc(SY.ref,{doc:JSON.stringify(toDoc(state)),at,dev:/Android/i.test(navigator.userAgent)?'폰':'컴퓨터'});
+    ss(K.at,at); ss(K.uid,SY.user.uid); if((+sg(K.local)||0)<=at)ss(K.dirty,null);
+    SY.lastAt=at; SY.err=''; setStatus('동기화됨 · 내 계정'); if(first)toast('이 기기 내용을 계정에 올렸어요',false);
+  }catch(e){SY.err='아직 못 올렸어요 · 인터넷이 되면 다시 올려요'}
+  renderSync();
+}
+function askMerge(d){
+  let cloud=null; try{cloud=fromDoc(JSON.parse(d.doc))}catch(e){}
+  const sum=s=>{const ys=Object.keys(s.years).sort();return ys.length?ys.map(y=>`FY${y} ${s.years[y].length}곳`).join(', '):'비어 있음'};
+  const when=new Date(d.at); const wt=`${when.getMonth()+1}/${when.getDate()} ${pad(when.getHours())}:${pad(when.getMinutes())}`;
+  openSheet(sh=>{
+    sh.innerHTML=`<div><h4>어느 쪽 내용으로 맞출까요?</h4><div class="sub">이 기기와 계정에 서로 다른 내용이 있어요. 고른 쪽으로 양쪽을 똑같이 맞춰요.</div></div>
+      <div class="opts">
+        <button type="button" class="btn" id="mgCloud" style="justify-content:flex-start;text-align:left">계정 내용 받기 · ${esc(cloud?sum(cloud):'')}<br><small>${esc(d.dev||'')} ${wt} 저장 · 이 기기 내용은 바뀌어요</small></button>
+        <button type="button" class="btn" id="mgLocal" style="justify-content:flex-start;text-align:left">이 기기 내용 올리기 · ${esc(sum(state))}<br><small>계정에 있던 내용은 바뀌어요</small></button>
+      </div>
+      <p class="fine">헷갈리면 먼저 아래 '엑셀로 내보내기'로 이 기기 내용을 받아 두고 고르면 안전해요.</p>
+      <div class="sheet-foot"><button type="button" class="btn" id="mgLater">나중에</button></div>`;
+    sh.querySelector('#mgCloud').onclick=()=>{closeSheet();ss(K.uid,SY.user.uid);apply(d);toast('계정 내용으로 맞췄어요',false)};
+    sh.querySelector('#mgLocal').onclick=()=>{closeSheet();ss(K.uid,SY.user.uid);upload(true)};
+    sh.querySelector('#mgLater').onclick=()=>{closeSheet();SY.err='동기화를 멈춰 뒀어요 · 다시 로그인하면 고를 수 있어요';renderSync()};
+  });
+}
+const AUTH_ERR={'auth/invalid-credential':'이메일이나 비밀번호가 맞지 않아요','auth/wrong-password':'비밀번호가 맞지 않아요','auth/user-not-found':'가입된 이메일이 아니에요 · 처음이면 \'처음이에요, 가입\'을 눌러요',
+  'auth/email-already-in-use':'이미 가입된 이메일이에요 · 로그인을 눌러요','auth/weak-password':'비밀번호는 6자 이상으로 해 주세요','auth/invalid-email':'이메일 형식이 맞지 않아요',
+  'auth/network-request-failed':'인터넷 연결을 확인해 주세요','auth/too-many-requests':'시도가 너무 많아요 · 잠시 후 다시 해 주세요','auth/operation-not-allowed':'Firebase에서 이메일/비밀번호 로그인을 켜 주세요'};
+function renderSync(){
+  const box=$('syncBox'); if(!box)return;
+  if(!SY.ready&&!SY.err){box.innerHTML='<p class="fine">연결 중…</p>';return}
+  if(!SY.user){
+    box.innerHTML=`<p class="fine">폰 앱과 컴퓨터(nal2nal2.github.io/audit-app)에서 같은 이메일로 로그인하면 내용이 자동으로 맞춰져요. 폰 위젯도 같이 바뀌어요.</p>
+      <div class="two"><label class="f">이메일<input type="email" id="syEmail" autocomplete="username" inputmode="email"></label><label class="f">비밀번호<input type="password" id="syPw" autocomplete="current-password" placeholder="6자 이상"></label></div>
+      <div class="actions"><button type="button" class="btn primary" id="syIn">로그인</button><button type="button" class="btn" id="syUp">처음이에요, 가입</button></div>
+      <button type="button" class="linkbtn" id="syForgot">비밀번호를 잊었어요</button>
+      ${SY.err?`<p class="err">${esc(SY.err)}</p>`:''}`;
+    if(!SY.auth)return;
+    const em=()=>box.querySelector('#syEmail').value.trim(), pw=()=>box.querySelector('#syPw').value;
+    const run=async fn=>{if(SY.busy)return;SY.busy=true;SY.err='';try{await fn()}catch(e){SY.err=AUTH_ERR[e&&e.code]||('로그인하지 못했어요 · '+(e&&e.code||''))}SY.busy=false;renderSync()};
+    box.querySelector('#syIn').onclick=()=>run(()=>SY.F.signInWithEmailAndPassword(SY.auth,em(),pw()));
+    box.querySelector('#syUp').onclick=()=>run(()=>SY.F.createUserWithEmailAndPassword(SY.auth,em(),pw()));
+    box.querySelector('#syForgot').onclick=()=>run(async()=>{if(!em())throw {code:'auth/invalid-email'};await SY.F.sendPasswordResetEmail(SY.auth,em());toast('비밀번호 재설정 메일을 보냈어요',false)});
+    return;
+  }
+  const t=SY.lastAt?new Date(SY.lastAt):null;
+  box.innerHTML=`<div class="who"><b>${esc(SY.user.email||'')}</b> 로 로그인됨</div>
+    <p class="fine">${sg(K.dirty)==='1'?'올릴 내용이 있어요…':t?`마지막 동기화 ${t.getMonth()+1}/${t.getDate()} ${pad(t.getHours())}:${pad(t.getMinutes())}`:'확인 중…'}</p>
+    ${SY.err?`<p class="err">${esc(SY.err)}</p>`:''}
+    <div class="actions"><button type="button" class="btn" id="syOut">로그아웃</button></div>
+    <p class="fine">로그아웃해도 이 기기에 있는 내용은 그대로 남아요.</p>`;
+  box.querySelector('#syOut').onclick=async()=>{await SY.F.signOut(SY.auth);ss(K.uid,null);SY.err='';toast('로그아웃했어요',false)};
 }
 async function initStore(){
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
