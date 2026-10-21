@@ -6,6 +6,8 @@ on:
     paths:
       - "index.html"
       - "xlsx.full.min.js"
+      - "firebase-config.js"
+      - "firebase-sync.js"
       - "native/**"
       - ".github/workflows/android.yml"
   workflow_dispatch:
