@@ -1,5 +1,5 @@
 // 앱 파일을 폰에 저장해 두고 인터넷 없이도 열리게 해요.
-const VERSION = 'audit-v12';
+const VERSION = 'audit-v13';
 const SHELL = ['./', 'index.html', 'xlsx.full.min.js', 'firebase-config.js', 'firebase-sync.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
