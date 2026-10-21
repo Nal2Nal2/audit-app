@@ -9,6 +9,7 @@ public class MainActivity extends BridgeActivity {
         // 웹 화면이 위젯에 요약을 넘겨줄 수 있게 연결해요
         registerPlugin(WidgetBridgePlugin.class);
         registerPlugin(SystemFontPlugin.class);
+        registerPlugin(TextReaderPlugin.class);
         super.onCreate(savedInstanceState);
     }
 

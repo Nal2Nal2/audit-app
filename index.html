@@ -262,6 +262,45 @@ h1{font-size:22px;font-weight:700;margin:0;letter-spacing:-.01em}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:12px;font-size:14px;display:flex;gap:12px;align-items:center;max-width:calc(100% - 32px);box-shadow:0 6px 24px rgba(0,0,0,.18);z-index:20}
 .toast button{border:0;background:transparent;color:var(--bg);font-weight:700;text-decoration:underline;padding:0;white-space:nowrap;flex:none}
 @media (max-width:380px){.strip{grid-template-columns:repeat(2,1fr)}}
+/* 조회서 */
+.cf-act{display:flex;flex-wrap:wrap;gap:8px}
+.cf-flt{align-self:flex-start;flex-wrap:wrap}
+.cf-sub{display:block;width:100%;font-size:12px;font-weight:500;color:var(--muted)}
+.cf-pg{font-size:12px;color:var(--muted);white-space:nowrap}
+.cf-h{font-size:12px;font-weight:700;color:var(--accent);margin-top:4px}
+.ci{border:1px solid var(--line);border-radius:10px;padding:9px 11px;display:flex;flex-direction:column;gap:5px}
+.ci.done{background:color-mix(in srgb,var(--surface) 70%,var(--bg))}
+.ci-h{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px}
+.ci-br{font-weight:500;color:var(--muted)}
+.ci-s{font-size:12px;color:var(--muted);word-break:keep-all}
+.ci-s a{color:var(--prog)}
+.ci-r{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px}
+.ci-d{color:var(--muted)}
+.ci-t{display:flex;flex-wrap:wrap;gap:6px}
+.regbtn{border:1px solid var(--prog);background:var(--prog-soft);color:var(--prog);border-radius:8px;padding:3px 9px;font-size:13px;font-weight:600;font-family:var(--f-mono);letter-spacing:.01em}
+.trk{color:var(--muted)} .trk.ok{color:var(--ok);font-weight:600}
+.rc-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;padding:10px 14px 14px}
+.rc-th{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:0;overflow:hidden;display:flex;flex-direction:column;text-align:left}
+.rc-th .ph{height:110px;background:var(--soft) center top/cover no-repeat;display:grid;place-items:center;font-size:11px;color:var(--muted)}
+.rc-th .t{font-size:12px;padding:4px 7px}
+.rpage{position:fixed;inset:0;z-index:15;background:var(--bg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.rbar{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--bg)}
+.rbar h3{margin:0;font-size:16px;flex:1}
+.iconbtn{border:1px solid var(--line);background:var(--surface);border-radius:10px;width:38px;height:38px;font-size:16px;color:var(--ink)}
+.btn.sm{padding:6px 11px;font-size:13px}
+.rpane{flex:none;height:42vh;background:#111;overflow:auto;position:relative}
+.rpane img{display:block;width:100%;height:auto;margin:0 auto}
+.rzoom{position:sticky;bottom:8px;left:100%;display:flex;gap:6px;justify-content:flex-end;padding:0 8px;width:max-content;margin-left:auto;margin-top:-46px}
+.rform{flex:1;overflow:auto;padding:14px 16px 40px;display:flex;flex-direction:column;gap:12px;max-width:640px;width:100%;margin:0 auto}
+.rlines{display:flex;flex-direction:column;gap:10px}
+.rline{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.rline.un{border-color:var(--warn)}
+.mono{font-family:var(--f-mono);letter-spacing:.03em}
+.rline input[readonly]{color:var(--muted);background:var(--soft)}
+.fine.warn,.warn{color:var(--warn)}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:sp 1s linear infinite;vertical-align:-1px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (min-width:900px){.rpage{flex-direction:row;flex-wrap:wrap}.rbar{width:100%}.rpane{height:auto;flex:1 1 55%;min-height:0;max-height:calc(100vh - 60px)}.rform{flex:1 1 40%;max-height:calc(100vh - 60px)}}
 </style>
 </head>
 <body>
@@ -273,7 +312,7 @@ h1{font-size:22px;font-weight:700;margin:0;letter-spacing:-.01em}
   </header>
 
   <nav class="years" id="years" aria-label="회계연도"></nav>
-  <div class="views" id="views" role="group" aria-label="보기"><button type="button" data-v="list">목록</button><button type="button" data-v="cal">달력</button></div>
+  <div class="views" id="views" role="group" aria-label="보기"><button type="button" data-v="list">목록</button><button type="button" data-v="cal">달력</button><button type="button" data-v="conf">조회서</button></div>
 
   <div id="main"></div>
 
@@ -319,7 +358,7 @@ let cur=null, lastSnapshot=null, toastTimer=null, store=null;
 const openSet=new Set();
 let flt=null;
 let view='list';
-try{view=localStorage.getItem('audit-ui-view')==='cal'?'cal':'list'}catch(e){}
+try{const v=localStorage.getItem('audit-ui-view');view=v==='cal'||v==='conf'?v:'list'}catch(e){}
 let ownerF='', ownerScope='confirm';
 try{const o=JSON.parse(localStorage.getItem('audit-ui-owner')||'null');if(o){ownerF=o.f||'';ownerScope=o.s||'confirm'}}catch(e){}
 const saveOwner=()=>{try{localStorage.setItem('audit-ui-owner',JSON.stringify({f:ownerF,s:ownerScope}))}catch(e){}};
@@ -366,11 +405,20 @@ function useLocal(msg){
 /* ---------- 폰 · 컴퓨터 동기화 (Firebase) ----------
    이 기기에 먼저 저장하고, 로그인돼 있으면 내 계정 저장소(users/내ID/audit/state)에도 올려요.
    다른 기기에서 더 나중에 고친 내용이 오면 그걸로 바꾸고 화면·위젯을 새로 그려요. */
-const SY={user:null,ref:null,unsub:null,timer:null,sending:0,err:'',busy:false,ready:false,lastAt:0};
+const SY={user:null,ref:null,unsub:null,timers:{},sending:{},err:'',busy:false,ready:false,lastAt:0};
 const sg=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
 const ss=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,String(v))}catch(e){}};
 const K={at:'audit-sync-at',local:'audit-local-at',dirty:'audit-sync-dirty',uid:'audit-sync-uid'};
+const kk=(k,id)=>id==='state'?K[k]:K[k]+':'+id;   // 'state'는 예전 키 그대로(이미 로그인한 기기 호환)
+const linked=()=>!!SY.user&&sg(K.uid)===SY.user.uid;
 const hasData=s=>Object.keys(s.years||{}).some(y=>(s.years[y]||[]).length);
+/* 동기화 묶음: state(회사·진행 상황) + conf_연도(조회서 발송리스트·등기) */
+function partOf(id){
+  if(id==='state')return {dump:()=>toDoc(state),load:o=>{state=fromDoc(o);lsWrite(toDoc(state))},has:()=>hasData(state)};
+  const m=/^conf_(\d{4})$/.exec(id); if(!m)return null; const y=m[1];
+  return {dump:()=>confY(y),load:o=>{confs.years[y]=normConf(o);confWrite()},has:()=>confHas(y)};
+}
+const localParts=()=>['state',...Object.keys(confs.years).map(y=>'conf_'+y)];
 function loadScript(src){return new Promise((res,rej)=>{const e=document.createElement('script');e.src=src;e.onload=res;e.onerror=rej;document.head.appendChild(e)})}
 async function syncStart(){
   const cfg=window.FIREBASE_CONFIG; if(!cfg)return;
@@ -379,48 +427,64 @@ async function syncStart(){
   const F=window.FB, app=F.initializeApp(cfg);
   SY.F=F; SY.auth=F.initializeAuth(app,{persistence:[F.indexedDBLocalPersistence,F.browserLocalPersistence]}); SY.db=F.getFirestore(app);
   F.onAuthStateChanged(SY.auth,u=>{SY.user=u;SY.ready=true;if(SY.unsub){SY.unsub();SY.unsub=null}SY.ref=null;if(u)attach();renderSync()});
-  window.addEventListener('online',()=>{if(SY.ref&&sg(K.dirty)==='1')upload()});
+  window.addEventListener('online',()=>{if(!linked())return;localParts().forEach(id=>{if(sg(kk('dirty',id))==='1')upload(id)});flushPhotos()});
 }
 function attach(){
-  const F=SY.F, uidv=SY.user.uid; SY.ref=F.doc(SY.db,'users',uidv,'audit','state');
-  SY.unsub=F.onSnapshot(SY.ref,snap=>{
-    if(snap.metadata.hasPendingWrites)return;
-    SY.err=''; handleRemote(snap.exists()?snap.data():null);
+  const F=SY.F, u=SY.user.uid; SY.ref=F.doc(SY.db,'users',u,'audit','state');
+  let first=true;
+  SY.unsub=F.onSnapshot(F.collection(SY.db,'users',u,'audit'),qs=>{
+    SY.err='';
+    const got={}; qs.docChanges().forEach(ch=>{if(ch.type!=='removed'&&!ch.doc.metadata.hasPendingWrites)got[ch.doc.id]=ch.doc.data()});
+    if(first){first=false;firstSync(got)} else Object.keys(got).forEach(id=>handleRemote(id,got[id]));
+    renderSync();
   },e=>{SY.err=e&&e.code==='permission-denied'?'저장소 규칙 때문에 막혔어요 · Firestore 규칙을 확인해 주세요':'연결이 끊겼어요 · 인터넷이 되면 다시 이어져요';renderSync()});
 }
-function handleRemote(d){
-  const linked=sg(K.uid)===SY.user.uid, syncAt=+sg(K.at)||0, localAt=+sg(K.local)||0, dirty=sg(K.dirty)==='1';
-  if(!d||!d.doc){if(hasData(state))upload(true);else{ss(K.uid,SY.user.uid);renderSync()}return}
-  if(d.at===SY.sending){SY.lastAt=d.at;renderSync();return}   // 방금 내가 올린 것
-  if(!linked){
-    if(!hasData(state)||JSON.stringify(toDoc(state))===d.doc){apply(d);ss(K.uid,SY.user.uid)}
-    else askMerge(d);
-    return;
+function firstSync(remote){
+  if(!linked()){
+    const st=remote.state;
+    const localAny=localParts().some(id=>partOf(id).has());
+    if(!st||!st.doc){ss(K.uid,SY.user.uid);localParts().forEach(id=>{if(partOf(id).has())upload(id,id==='state')});Object.keys(remote).forEach(id=>{if(id!=='state')handleRemote(id,remote[id])});flushPhotos();return}
+    if(!localAny||JSON.stringify(toDoc(state))===st.doc){
+      ss(K.uid,SY.user.uid);
+      Object.keys(remote).forEach(id=>{const p=partOf(id);if(!p)return;if(id==='state'||!p.has())apply(id,remote[id]);else handleRemote(id,remote[id])});
+      localParts().forEach(id=>{if(!remote[id]&&partOf(id).has())upload(id)});
+      flushPhotos(); return;
+    }
+    askMerge(remote); return;
   }
-  if(d.at<=syncAt){SY.lastAt=syncAt;if(dirty)upload();else renderSync();return}
-  if(dirty&&localAt>d.at)upload(); else apply(d);
+  Object.keys(remote).forEach(id=>handleRemote(id,remote[id]));
+  localParts().forEach(id=>{if(!remote[id]&&partOf(id).has())upload(id)});
+  flushPhotos();
 }
-function apply(d){
-  try{state=fromDoc(JSON.parse(d.doc))}catch(e){return}
-  lsWrite(toDoc(state)); ss(K.at,d.at); ss(K.dirty,null); SY.lastAt=d.at;
+function handleRemote(id,d){
+  const part=partOf(id); if(!part||!d||!d.doc||!linked())return;
+  if(d.at===SY.sending[id]){SY.lastAt=Math.max(SY.lastAt,d.at);return}   // 방금 내가 올린 것
+  const syncAt=+sg(kk('at',id))||0, localAt=+sg(kk('local',id))||0, dirty=sg(kk('dirty',id))==='1';
+  if(d.at<=syncAt){SY.lastAt=Math.max(SY.lastAt,syncAt);if(dirty)upload(id);return}
+  if(dirty&&localAt>d.at)upload(id); else apply(id,d);
+}
+function apply(id,d){
+  const part=partOf(id); if(!part)return;
+  try{part.load(JSON.parse(d.doc))}catch(e){return}
+  ss(kk('at',id),d.at); ss(kk('dirty',id),null); SY.lastAt=Math.max(SY.lastAt,d.at);
   render(); setStatus('동기화됨 · 내 계정'); renderSync();
 }
-function syncLocalChanged(){
-  ss(K.local,Date.now()); ss(K.dirty,'1');
-  if(SY.ref&&sg(K.uid)===SY.user.uid){clearTimeout(SY.timer);SY.timer=setTimeout(upload,800)}
+function syncLocalChanged(id){
+  id=id||'state'; ss(kk('local',id),Date.now()); ss(kk('dirty',id),'1');
+  if(SY.ref&&linked()){clearTimeout(SY.timers[id]);SY.timers[id]=setTimeout(()=>upload(id),800)}
 }
-async function upload(first){
-  if(!SY.ref)return; clearTimeout(SY.timer);
-  const at=Date.now(); SY.sending=at;
+async function upload(id,first){
+  if(!SY.ref)return; const part=partOf(id); if(!part)return; clearTimeout(SY.timers[id]);
+  const at=Date.now(); SY.sending[id]=at;
   try{
-    await SY.F.setDoc(SY.ref,{doc:JSON.stringify(toDoc(state)),at,dev:/Android/i.test(navigator.userAgent)?'폰':'컴퓨터'});
-    ss(K.at,at); ss(K.uid,SY.user.uid); if((+sg(K.local)||0)<=at)ss(K.dirty,null);
-    SY.lastAt=at; SY.err=''; setStatus('동기화됨 · 내 계정'); if(first)toast('이 기기 내용을 계정에 올렸어요',false);
+    await SY.F.setDoc(SY.F.doc(SY.db,'users',SY.user.uid,'audit',id),{doc:JSON.stringify(part.dump()),at,dev:/Android/i.test(navigator.userAgent)?'폰':'컴퓨터'});
+    ss(kk('at',id),at); ss(K.uid,SY.user.uid); if((+sg(kk('local',id))||0)<=at)ss(kk('dirty',id),null);
+    SY.lastAt=Math.max(SY.lastAt,at); SY.err=''; setStatus('동기화됨 · 내 계정'); if(first)toast('이 기기 내용을 계정에 올렸어요',false);
   }catch(e){SY.err='아직 못 올렸어요 · 인터넷이 되면 다시 올려요'}
   renderSync();
 }
-function askMerge(d){
-  let cloud=null; try{cloud=fromDoc(JSON.parse(d.doc))}catch(e){}
+function askMerge(remote){
+  const d=remote.state; let cloud=null; try{cloud=fromDoc(JSON.parse(d.doc))}catch(e){}
   const sum=s=>{const ys=Object.keys(s.years).sort();return ys.length?ys.map(y=>`FY${y} ${s.years[y].length}곳`).join(', '):'비어 있음'};
   const when=new Date(d.at); const wt=`${when.getMonth()+1}/${when.getDate()} ${pad(when.getHours())}:${pad(when.getMinutes())}`;
   openSheet(sh=>{
@@ -431,8 +495,8 @@ function askMerge(d){
       </div>
       <p class="fine">헷갈리면 먼저 아래 '엑셀로 내보내기'로 이 기기 내용을 받아 두고 고르면 안전해요.</p>
       <div class="sheet-foot"><button type="button" class="btn" id="mgLater">나중에</button></div>`;
-    sh.querySelector('#mgCloud').onclick=()=>{closeSheet();ss(K.uid,SY.user.uid);apply(d);toast('계정 내용으로 맞췄어요',false)};
-    sh.querySelector('#mgLocal').onclick=()=>{closeSheet();ss(K.uid,SY.user.uid);upload(true)};
+    sh.querySelector('#mgCloud').onclick=()=>{closeSheet();ss(K.uid,SY.user.uid);Object.keys(remote).forEach(id=>apply(id,remote[id]));localParts().forEach(id=>{if(!remote[id]&&partOf(id).has())upload(id)});flushPhotos();toast('계정 내용으로 맞췄어요',false)};
+    sh.querySelector('#mgLocal').onclick=()=>{closeSheet();ss(K.uid,SY.user.uid);localParts().forEach(id=>upload(id,id==='state'));flushPhotos()};
     sh.querySelector('#mgLater').onclick=()=>{closeSheet();SY.err='동기화를 멈춰 뒀어요 · 다시 로그인하면 고를 수 있어요';renderSync()};
   });
 }
@@ -458,7 +522,7 @@ function renderSync(){
   }
   const t=SY.lastAt?new Date(SY.lastAt):null;
   box.innerHTML=`<div class="who"><b>${esc(SY.user.email||'')}</b> 로 로그인됨</div>
-    <p class="fine">${sg(K.dirty)==='1'?'올릴 내용이 있어요…':t?`마지막 동기화 ${t.getMonth()+1}/${t.getDate()} ${pad(t.getHours())}:${pad(t.getMinutes())}`:'확인 중…'}</p>
+    <p class="fine">${localParts().some(id=>sg(kk('dirty',id))==='1')?'올릴 내용이 있어요…':t?`마지막 동기화 ${t.getMonth()+1}/${t.getDate()} ${pad(t.getHours())}:${pad(t.getMinutes())}`:'확인 중…'}</p>
     ${SY.err?`<p class="err">${esc(SY.err)}</p>`:''}
     <div class="actions"><button type="button" class="btn" id="syOut">로그아웃</button></div>
     <p class="fine">로그아웃해도 이 기기에 있는 내용은 그대로 남아요.</p>`;
@@ -578,6 +642,7 @@ function renderMain(){
   }
   const L=list().filter(ownMatch);
   if(view==='cal'){renderCalendar(m,L.filter(c=>c.join!=='n'));return}
+  if(view==='conf'){renderConf(m,ownMatch);return}
   const inn=L.filter(c=>c.join==='y'), und=L.filter(c=>c.join===''), out=L.filter(c=>c.join==='n');
 
   // progress strip
@@ -765,7 +830,8 @@ function setupWidgetSetting(){
   if(CapApp&&CapApp.addListener){
     CapApp.addListener('backButton',()=>{
       if(!$('scrim').hidden){closeSheet();return}
-      if(view==='cal'){view='list';try{localStorage.setItem('audit-ui-view',view)}catch(e){};render();return}
+      if(rpClose){rpClose();return}
+      if(view==='cal'||view==='conf'){view='list';try{localStorage.setItem('audit-ui-view',view)}catch(e){};render();return}
       if(flt){flt=null;renderMain();return}
       if(window.scrollY>200){window.scrollTo({top:0,behavior:'smooth'});return}
       CapApp.exitApp();
@@ -1200,11 +1266,12 @@ function mergeInto(y,res){
 $('fileIn').addEventListener('change',async e=>{
   const files=[...e.target.files]; e.target.value=''; if(!files.length)return;
   if(!window.XLSX){toast('엑셀 읽기 도구를 못 불러왔어요. 새로고침해 주세요',false);return}
-  snapshot(); const got=[]; let failed=0;
+  snapshot(); const got=[], confRows=[]; let failed=0;
   for(const f of files){
     try{
       const wb=XLSX.read(await f.arrayBuffer(),{type:'array',cellFormula:true});
       wb.SheetNames.forEach(n=>{
+        if(isConfSheet(wb.Sheets[n])){confRows.push(...readConfSheet(wb.Sheets[n],n));return}   // 조회서 발송리스트
         const res=readSheet(wb.Sheets[n]); if(!res.rows.length)return;
         const m=String(n).match(/(20\d\d)/);
         if(res.full){
@@ -1218,10 +1285,466 @@ $('fileIn').addEventListener('change',async e=>{
       });
     }catch(err){failed++}
   }
+  if(confRows.length){
+    const r=importConfRows(confRows);
+    if(r){confCommit(r.y);view='conf';try{localStorage.setItem('audit-ui-view',view)}catch(e){}
+      if(!got.length){render();
+        if(r.miss.length)openSheet(sh=>{sh.innerHTML=`<div><h4>조회서 ${r.n}곳을 불러왔어요</h4><div class="sub">FY${esc(r.y)} · 회사 ${r.cos}곳</div></div><p class="fine">앱 회사 목록에 없는 이름이 있어요. 그대로 보여 두고 '앱에 없는 회사'라고 표시해요. 이름을 앱과 똑같이 고쳐서 다시 올리면 연결돼요.</p><div class="note">${r.miss.map(esc).join('\n')}</div><div class="sheet-foot"><button type="button" class="btn primary" id="cmOk">확인</button></div>`;sh.querySelector('#cmOk').onclick=closeSheet});
+        else toast(`조회서 ${r.n}곳을 불러왔어요 · 회사 ${r.cos}곳`,false);
+        lastSnapshot=null; return}}
+  }
   if(!got.length){lastSnapshot=null;toast(failed?'파일을 읽지 못했어요. .xlsx 파일인지 확인해 주세요':'구분(회사명) 열이 있는 표를 못 찾았어요',false);return}
   cur=got[got.length-1].y;
   commit(`불러왔어요 · ${got.map(x=>x.t).join(', ')}`);
 });
+
+/* ---------- 조회서: 발송리스트 · 등기 영수증 · 배달 조회 ----------
+   연도마다 {items:[조회처…], receipts:[영수증…]}를 이 기기에 저장하고, 로그인돼 있으면 conf_연도 문서로 동기화해요. */
+const CONF_LS='audit-conf-v1';
+let confs={years:{}};
+try{const r=localStorage.getItem(CONF_LS);if(r){const o=JSON.parse(r);if(o&&o.years)confs=o}}catch(e){}
+const NATIVE=!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
+const WB=()=>NATIVE&&Capacitor.Plugins&&Capacitor.Plugins.WidgetBridge;
+function normConf(o){return {items:Array.isArray(o&&o.items)?o.items:[],receipts:Array.isArray(o&&o.receipts)?o.receipts:[]}}
+function confY(y){y=y||cur;return confs.years[y]||(confs.years[y]={items:[],receipts:[]})}
+const confHas=y=>{const c=confs.years[y];return !!c&&(c.items.length>0||c.receipts.length>0)};
+function confWrite(){try{localStorage.setItem(CONF_LS,JSON.stringify(confs))}catch(e){toast('저장 공간이 부족해요',false)}}
+function confCommit(y,msg){confWrite();syncLocalChanged('conf_'+(y||cur));renderMain();if(msg)toast(msg,false)}
+const coKey=s=>String(s||'').replace(/\(주\)|㈜|주식회사|\(유\)|유한회사|[\s()·.,\-]/g,'').toLowerCase();
+const regFmt=r=>{const d=String(r||'').replace(/\D/g,'');return d.length===13?`${d.slice(0,5)}-${d.slice(5,9)}-${d.slice(9)}`:d};
+const regDigits=r=>String(r||'').replace(/\D/g,'');
+const KIND={fin:'금융거래',ar:'채권채무'};
+let confFlt='all', confOpen=new Set();
+try{confFlt=localStorage.getItem('audit-conf-flt')||'all'}catch(e){}
+
+/* 엑셀: 제목줄에서 '조회처명' 같은 칸을 찾아 읽어요 (제목·빈 줄이 섞여 있어도 괜찮아요) */
+const CH={
+  co:['회사명','회사','감사회사','피감사회사','감사대상'],
+  kind:['조회서','조회서종류','조회서구분','종류'],
+  name:['조회처명','조회처','조회금융기관명','조회기관명','금융기관명','금융기관','거래처명','거래처'],
+  branch:['지점명','지점'], addr:['주소'], person:['조회부서및담당자','부서및담당자','담당부서및담당자','담당자','조회부서'],
+  phone:['담당전화번호','전화번호','연락처','전화'], zip:['우편번호'], no:['조회번호','번호','no'], cls:['조회처분류','분류']
+};
+const hnorm=v=>str(v).replace(/[\s.]/g,'').toLowerCase();
+function confHeaderAt(ws,r,range){
+  const head={};
+  for(let c=range.s.c;c<=range.e.c;c++){const v=hnorm(cellVal(ws,r,c));if(v&&!(v in head))head[v]=c}
+  const col={};
+  Object.keys(CH).forEach(k=>{for(const n of CH[k]){if(n in head){col[k]=head[n];break}}});
+  return col.name!=null&&(col.addr!=null||col.zip!=null)?col:null;
+}
+function isConfSheet(ws){
+  if(!ws||!ws['!ref'])return false; const range=XLSX.utils.decode_range(ws['!ref']);
+  for(let r=range.s.r;r<=Math.min(range.e.r,range.s.r+30);r++)if(confHeaderAt(ws,r,range))return true;
+  return false;
+}
+function readConfSheet(ws,sheetName){
+  const range=XLSX.utils.decode_range(ws['!ref']); const out=[]; let col=null, isFin=false;
+  for(let r=range.s.r;r<=range.e.r;r++){
+    const h=confHeaderAt(ws,r,range);
+    if(h){col=h;isFin=/금융/.test(str(cellVal(ws,r,h.name)));continue}
+    if(!col)continue;
+    const g=k=>col[k]!=null?str(cellVal(ws,r,col[k])):'';
+    const name=g('name'); if(!name)continue;
+    if(/^\d+\.\s*\S/.test(name)&&!g('addr'))continue;   // '2.거래처 목록' 같은 제목줄
+    const kt=g('kind'); const kind=/금융/.test(kt)?'fin':/채권|채무|매출|매입/.test(kt)?'ar':isFin?'fin':'ar';
+    let zip=g('zip').replace(/\D/g,''); if(zip&&zip.length<5)zip=zip.padStart(5,'0');
+    const addr=g('addr');
+    out.push({co:g('co')||String(sheetName||''),kind,name,branch:g('branch'),addr,person:g('person'),phone:g('phone'),zip,no:g('no'),cls:g('cls'),online:/온라인/.test(addr)||(!addr&&!zip)});
+  }
+  return out;
+}
+/* 회사별로 통째로 바꾸되, 같은 조회처(회사·종류·이름·지점)는 발송·등기·배달·회신 기록을 이어받아요 */
+function importConfRows(rows){
+  const y=cur; if(!y){toast('먼저 회계연도를 만들어 주세요',false);return null}
+  const C=confY(y), comps=list(), byKey={}; comps.forEach(c=>{byKey[coKey(c.name)]=c});
+  const ik=it=>[coKey(it.coName),it.kind,coKey(it.name),coKey(it.branch)].join('|');
+  const old={}; C.items.forEach(it=>{old[ik(it)]=it});
+  const groups={}; rows.forEach(r=>{const k=coKey(r.co);if(!k)return;(groups[k]=groups[k]||[]).push(r)});
+  const miss=[]; let n=0;
+  Object.keys(groups).forEach(k=>{
+    const comp=byKey[k]; const coName=comp?comp.name:groups[k][0].co; if(!comp)miss.push(coName);
+    C.items=C.items.filter(it=>coKey(it.coName)!==k);
+    groups[k].forEach(r=>{
+      const it={id:uid(),coId:comp?comp.id:'',coName,kind:r.kind,name:r.name,branch:r.branch,addr:r.addr,person:r.person,phone:r.phone,zip:r.zip,no:r.no,cls:r.cls,online:r.online,
+        reg:'',sent:'',dlv:false,dlvAt:'',rep:false,repAt:'',note:'',trk:null,rc:''};
+      const o=old[ik(it)]; if(o)['id','reg','sent','dlv','dlvAt','rep','repAt','note','trk','rc'].forEach(f=>{it[f]=o[f]});
+      C.items.push(it); n++;
+    });
+  });
+  return {y,n,cos:Object.keys(groups).length,miss};
+}
+function confTemplate(){
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet([['회사명','조회서','조회처명','지점명','주소','조회부서 및 담당자','담당전화번호','우편번호'],
+    ['AA','금융거래','신한은행','역삼지점','온라인조회','','',''],['AA','금융거래','교보생명보험','','서울시 종로구 종로 1','재무팀 홍길동','02-000-0000','03154'],['BB','채권채무','서울가스','','서울시 마포구 토정로 51-1','정순식','010-0000-0000','04083']]);
+  ws['!cols']=[{wch:12},{wch:9},{wch:16},{wch:10},{wch:36},{wch:18},{wch:15},{wch:9}];
+  XLSX.utils.book_append_sheet(wb,ws,'조회서 발송리스트');
+  return wb;
+}
+
+/* 영수증 사진: 이 기기(IndexedDB)에 두고, 로그인돼 있으면 계정에도 올려 다른 기기에서 볼 수 있게 해요 */
+const PQ='audit-photo-q';
+function pdb(){return new Promise((res,rej)=>{const r=indexedDB.open('audit-photos',1);r.onupgradeneeded=()=>r.result.createObjectStore('p');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function pPut(id,b){const d=await pdb();return new Promise((res,rej)=>{const t=d.transaction('p','readwrite');t.objectStore('p').put(b,id);t.oncomplete=res;t.onerror=()=>rej(t.error)})}
+async function pGetLocal(id){try{const d=await pdb();return await new Promise(res=>{const q=d.transaction('p').objectStore('p').get(id);q.onsuccess=()=>res(q.result||null);q.onerror=()=>res(null)})}catch(e){return null}}
+async function pDel(id){try{const d=await pdb();d.transaction('p','readwrite').objectStore('p').delete(id)}catch(e){}
+  if(SY.ref&&linked())SY.F.deleteDoc(SY.F.doc(SY.db,'users',SY.user.uid,'photos',id)).catch(()=>{})}
+const b2u=b=>new Promise(res=>{const r=new FileReader();r.onload=()=>res(String(r.result));r.readAsDataURL(b)});
+async function u2b(u){return (await fetch(u)).blob()}
+async function pGet(id){
+  let b=await pGetLocal(id); if(b)return b;
+  if(SY.ref&&linked()){try{const s=await SY.F.getDoc(SY.F.doc(SY.db,'users',SY.user.uid,'photos',id));if(s.exists()){b=await u2b(s.data().b64);await pPut(id,b);return b}}catch(e){}}
+  return null;
+}
+const pq=()=>{try{return JSON.parse(localStorage.getItem(PQ)||'[]')}catch(e){return []}};
+const pqSet=a=>{try{localStorage.setItem(PQ,JSON.stringify(a))}catch(e){}};
+async function photoUpload(id){
+  const q=pq(); if(!q.includes(id)){q.push(id);pqSet(q)}
+  if(SY.ref&&linked())flushPhotos();
+}
+let flushing=false;
+async function flushPhotos(){
+  if(flushing||!SY.ref||!linked())return; flushing=true;
+  for(const id of pq()){
+    try{const b=await pGetLocal(id);if(b)await SY.F.setDoc(SY.F.doc(SY.db,'users',SY.user.uid,'photos',id),{b64:await b2u(b),at:Date.now()});pqSet(pq().filter(x=>x!==id))}catch(e){break}
+  }
+  flushing=false;
+}
+function loadImg(blob){return new Promise((res,rej)=>{const u=URL.createObjectURL(blob);const i=new Image();i.onload=()=>res({i,u});i.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('img'))};i.src=u})}
+function cv2blob(c,q){return new Promise(r=>c.toBlob(r,'image/jpeg',q))}
+async function resizeTo(img,maxSide,q,gray,minW){
+  let s=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight)); if(minW&&img.naturalWidth*s<minW)s=Math.min(2.5,minW/img.naturalWidth);
+  const c=document.createElement('canvas'); c.width=Math.round(img.naturalWidth*s); c.height=Math.round(img.naturalHeight*s);
+  const g=c.getContext('2d'); if(gray)g.filter='grayscale(1) contrast(1.35)'; g.drawImage(img,0,0,c.width,c.height); return cv2blob(c,q);
+}
+/* 보관용(1MB 안으로)과 글자 읽기용 사진을 따로 만들어요 */
+async function prepReceipt(file){
+  const {i,u}=await loadImg(file);
+  let keep=await resizeTo(i,1600,0.75), side=1600, q=0.75;
+  while(keep.size>680000&&side>800){side-=200;q-=0.05;keep=await resizeTo(i,side,q)}
+  let ocr;
+  if(NATIVE)ocr=await resizeTo(i,2400,0.9);
+  else{ // 컴퓨터: 2배로 키운 흑백 사진 두 가지(대비 보통/강하게)로 읽어서 서로 비교해요
+    const sc=Math.max(1,Math.min(2,2600/Math.max(i.naturalWidth,i.naturalHeight)));
+    const mk=f=>{const c=document.createElement('canvas');c.width=Math.round(i.naturalWidth*sc);c.height=Math.round(i.naturalHeight*sc);const g=c.getContext('2d');g.imageSmoothingQuality='high';g.filter=f;g.drawImage(i,0,0,c.width,c.height);return new Promise(r=>c.toBlob(r,'image/png'))};
+    ocr=[await mk('grayscale(1)'),await mk('grayscale(1) contrast(1.8)')];
+  }
+  URL.revokeObjectURL(u); return {keep,ocr};
+}
+
+/* 글자 읽기: 폰은 ML Kit(폰 안에서), 컴퓨터는 tesseract(브라우저 안에서) — 사진은 밖으로 안 나가요 */
+let tessWorker=null;
+async function readReceiptText(blob,onStep){
+  const TR=NATIVE&&Capacitor.Plugins&&Capacitor.Plugins.TextReader;
+  if(TR){const b64=(await b2u(Array.isArray(blob)?blob[0]:blob)).split(',')[1];return await TR.read({base64:b64})}
+  if(!window.Tesseract){onStep&&onStep('글자 읽기 도구 불러오는 중… (처음 한 번만)');await loadScript('ocr/tesseract.min.js')}
+  if(!tessWorker){const base=new URL('ocr/',location.href).href;tessWorker=await Tesseract.createWorker('eng',1,{workerPath:base+'worker.min.js',corePath:base,langPath:base.replace(/\/$/,'')})}
+  const bs=Array.isArray(blob)?blob:[blob], texts=[];
+  for(let k=0;k<bs.length;k++){onStep&&onStep(`글자 읽는 중… (${k+1}/${bs.length})`);const {data}=await tessWorker.recognize(bs[k]);texts.push(data.text)}
+  return {text:texts[0],alt:texts.slice(1),lines:null};
+}
+/* 영수증 글자에서 등기번호·요금·우편번호·받는 분을 뽑아요 */
+function receiptRows(res){
+  const L=(res&&res.lines)||[];
+  if(L.length&&L[0].left!=null){
+    const ls=L.slice().sort((a,b)=>a.top-b.top), rows=[];
+    ls.forEach(l=>{const cy=l.top+l.height/2;const r=rows.find(r=>Math.abs(r.cy-cy)<Math.max(r.h,l.height)*0.6);if(r){r.ls.push(l)}else rows.push({cy,h:l.height,ls:[l]})});
+    return rows.map(r=>r.ls.sort((a,b)=>a.left-b.left).map(l=>l.text).join(' '));
+  }
+  return String(res&&res.text||'').split(/\n+/);
+}
+function parseReceipt(res){
+  const rows=receiptRows(res), all=rows.join('\n'), out=[], seen=new Set();
+  rows.forEach(t0=>{
+    const t=t0.replace(/(?<=\d)[Oo](?=\d|\b)/g,'0').replace(/(?<=\d)[lI|](?=\d)/g,'1');
+    const m=t.match(/(\d{5})\s*[-–—~]\s*(\d{4})\s*[-–—~]\s*(\d{4})/)||t.match(/(?<![\d-])(\d{13})(?![\d-])/);
+    if(!m)return;
+    const reg=regDigits(m[0]); if(reg.length!==13||seen.has(reg))return; seen.add(reg);
+    let rest=t.slice(m.index+m[0].length);
+    const fee=(rest.match(/\d{1,3}(?:,\d{3})+|\d{3,6}(?=\s+\d{5}\b)/)||[''])[0]; if(fee)rest=rest.slice(rest.indexOf(fee)+fee.length);
+    const zm=rest.match(/(?<![\d,\-])(\d{5})(?![\d,])/); let zip='', name='';
+    if(zm){zip=zm[1];name=rest.slice(zm.index+5)}
+    name=name.replace(/[^가-힣A-Za-z0-9()㈜*●\s]/g,' ').replace(/\s+/g,' ').trim().slice(0,20);
+    out.push({reg,fee,zip,name,item:''});
+  });
+  // 두 번 읽은 결과가 다르면 그 자리 숫자를 '확인 필요'로 표시해요
+  (res&&res.alt||[]).forEach(t=>{
+    const regs=(t.match(/\d{5}\s*[-–—~]\s*\d{4}\s*[-–—~]\s*\d{4}/g)||[]).map(regDigits);
+    out.forEach(l=>{
+      const best=regs.map(r=>({r,d:[...r].filter((ch,i)=>ch!==l.reg[i]).length})).sort((a,b)=>a.d-b.d)[0];
+      if(best&&best.d>0&&best.d<=3){l.doubt=[...new Set([...(l.doubt||[]),...[...best.r].map((ch,i)=>ch!==l.reg[i]?i:-1).filter(i=>i>=0)])];l.alt=best.r}
+    });
+  });
+  const dm=all.match(/접수\s*일\s*시?\s*[:：]?\s*(20\d{2})\s*[-.\/]\s*(\d{1,2})\s*[-.\/]\s*(\d{1,2})/)||all.match(/(20\d{2})\s*[-.\/]\s*(\d{2})\s*[-.\/]\s*(\d{2})/);
+  const date=dm?`${dm[1]}-${pad(+dm[2])}-${pad(+dm[3])}`:'';
+  return {lines:out,date};
+}
+/* 우편번호가 같고 이름이 비슷한 조회처에 자동으로 붙여요(헷갈리면 비워 둬서 내가 고르게) */
+function matchItems(lines,y){
+  const pool=confY(y).items.filter(it=>!it.online);
+  const nameSim=(a,b)=>{a=coKey(a).replace(/\*|●/g,'');b=coKey(b);if(!a||!b)return 0;let s=0;for(const ch of new Set(a))if(b.includes(ch))s++;return s/Math.max(3,a.length)};
+  const taken=new Set();
+  lines.forEach(l=>{
+    if(l.item)return;
+    const same=pool.find(it=>regDigits(it.reg)===l.reg); if(same){l.item=same.id;taken.add(same.id);return}
+    const cands=pool.filter(it=>it.zip&&it.zip===l.zip&&!taken.has(it.id)).map(it=>({it,sc:nameSim(l.name,it.name)+nameSim(l.name,it.person)*0.5-(it.reg?0.6:0)})).sort((a,b)=>b.sc-a.sc);
+    if(cands.length===1||(cands.length>1&&cands[0].sc-cands[1].sc>=0.25)){l.item=cands[0].it.id;taken.add(l.item)}
+  });
+  return lines;
+}
+
+/* 배달 조회: 폰은 우체국 조회 결과를 직접 받아 정리하고, 컴퓨터는 조회 페이지를 열어요 */
+const traceURL=r=>`https://service.epost.go.kr/trace.RetrieveRegiPrclDeliv.postal?sid1=${regDigits(r)}`;
+function openTrace(r){const u=traceURL(r);const W=WB();if(W&&W.openUrl)W.openUrl({url:u}).catch(()=>window.open(u,'_blank'));else window.open(u,'_blank','noopener')}
+function parseTrace(html,reg){
+  const d=new DOMParser().parseFromString(html,'text/html'), cl=n=>n?n.textContent.replace(/\s+/g,' ').trim():'';
+  let sum=null;
+  d.querySelectorAll('th[scope="row"]').forEach(th=>{if(!sum&&regDigits(th.textContent)===reg){const tds=th.parentElement.querySelectorAll('td');if(tds.length>=5)sum=[...tds].map(cl)}});
+  const ev=[];
+  d.querySelectorAll('tr').forEach(tr=>{const sp=tr.querySelector('.evtnm');if(!sp)return;const td=tr.querySelectorAll('td');if(td.length<4)return;ev.push({d:cl(td[0]),t:cl(td[1]),loc:cl(td[2]).replace(/\s*(TEL\s*:?\s*)?\d{2,4}[.\-]\d{3,4}[.\-]\d{4}/,'').trim(),st:cl(sp)})});
+  if(!sum&&!ev.length)return null;
+  const last=ev[ev.length-1]||null;
+  return {st:sum?sum[sum.length-1]:(last?last.st:''),who:sum&&sum.length>=5?sum[2]:'',at:last?`${last.d} ${last.t}`:'',loc:last?last.loc:'',chk:Date.now()};
+}
+async function trackItem(it){
+  const W=WB(); if(!W||!W.trace)return {err:'web'};
+  const reg=regDigits(it.reg); if(reg.length!==13)return {err:'등기번호가 13자리가 아니에요'};
+  let r; try{r=await W.trace({sid:reg})}catch(e){return {err:'우체국에 연결하지 못했어요'}}
+  const t=parseTrace(r.html||'',reg);
+  if(!t){it.trk={st:'',who:'',at:'',loc:'',chk:Date.now(),none:true};return {err:'아직 조회 결과가 없어요 · 접수 직후엔 조금 걸려요'}}
+  it.trk=t;
+  if(/배달\s*완료/.test(t.st)){if(!it.dlv){it.dlv=true;it.dlvAt=t.at.slice(0,10).replace(/\./g,'-')}}
+  return {ok:true,t};
+}
+async function trackAll(y,quiet){
+  const C=confY(y), todo=C.items.filter(it=>regDigits(it.reg).length===13&&!it.dlv);
+  if(!todo.length){if(!quiet)toast('확인할 등기가 없어요 · 모두 배달완료예요',false);return}
+  if(!quiet)toast(`배달 상태 확인 중… (${todo.length}건)`,false);
+  let done=0,fail=0;
+  for(const it of todo){const r=await trackItem(it);if(r.ok&&it.dlv)done++;else if(r.err&&r.err!=='web'&&!/결과가 없/.test(r.err))fail++;await new Promise(z=>setTimeout(z,500))}
+  try{localStorage.setItem('audit-trk-at',String(Date.now()))}catch(e){}
+  confCommit(y,quiet&&!done?'':`배달 상태 확인 끝 · 새로 배달완료 ${done}건${fail?` · ${fail}건 연결 실패`:''}`);
+}
+function autoTrack(){
+  if(!NATIVE||!cur)return; let last=0; try{last=+localStorage.getItem('audit-trk-at')||0}catch(e){}
+  if(Date.now()-last<3*3600e3)return;   // 앱을 열 때 3시간에 한 번만 자동으로 확인해요
+  if(confY(cur).items.some(it=>regDigits(it.reg).length===13&&!it.dlv))trackAll(cur,true);
+}
+
+/* 화면 */
+function renderConf(m,ownMatch){
+  const y=cur, C=confY(y), comps=list();
+  const byId2={}; comps.forEach(c=>{byId2[c.id]=c});
+  const visible=C.items.filter(it=>{const c=it.coId&&byId2[it.coId];return !c||ownMatch(c)});
+  const mailed=visible.filter(it=>!it.online);
+  const act=document.createElement('div'); act.className='cf-act';
+  act.innerHTML=`<label class="btn" for="fileIn">발송리스트 엑셀 올리기</label><button type="button" class="btn primary" id="rcAdd">등기 영수증 추가</button>${NATIVE&&mailed.some(it=>it.reg&&!it.dlv)?'<button type="button" class="btn" id="trkAll">배달 상태 확인</button>':''}`;
+  m.appendChild(act);
+  act.querySelector('#rcAdd').onclick=()=>pickReceipt(y);
+  const ta=act.querySelector('#trkAll'); if(ta)ta.onclick=()=>trackAll(y);
+  if(!C.items.length){
+    const e=document.createElement('div'); e.className='empty';
+    e.innerHTML=`<h2>FY${esc(y)} 조회서 발송리스트를 올려 주세요</h2><p>회사명 · 조회서(금융거래/채권채무) · 조회처명 · 주소 · 조회부서 및 담당자 · 우편번호 칸이 있는 엑셀이면 돼요. 주소에 '온라인조회'라고 적힌 곳은 등기 관리에서 빠져요. 올린 회사만 여기에 보여요.</p><button type="button" class="btn" id="cfTpl">빈 양식 받기</button>`;
+    m.appendChild(e); e.querySelector('#cfTpl').onclick=()=>saveWb(confTemplate(),'조회서_발송리스트_양식.xlsx');
+    renderReceiptFold(m,y); return;
+  }
+  const n=f=>mailed.filter(f).length;
+  const strip=document.createElement('div'); strip.className='strip';
+  [['우편 발송',mailed.length,null],['등기 입력',n(it=>it.reg),mailed.length],['배달완료',n(it=>it.dlv),n(it=>it.reg)],['회신',visible.filter(it=>it.rep).length,visible.length]].forEach(([k,v,t])=>{
+    const d=document.createElement('div'); d.className='cell'; const pct=t?Math.round(v/t*100):0;
+    d.innerHTML=`<div class="k">${k}</div><div class="v">${v}${t!=null?`<small>/${t}</small>`:''}</div>${t!=null?`<div class="bar"><i style="width:${pct}%"></i></div>`:''}`; strip.appendChild(d);
+  });
+  m.appendChild(strip);
+  const F={all:['전체',()=>true],noreg:['등기 입력 전',it=>!it.online&&!it.reg],nodlv:['배달 확인 전',it=>!it.online&&it.reg&&!it.dlv],norep:['회신 전',it=>!it.rep]};
+  const seg=document.createElement('div'); seg.className='seg small cf-flt';
+  seg.innerHTML=Object.keys(F).map(k=>`<button type="button" data-v="${k}" aria-pressed="${confFlt===k}">${F[k][0]}</button>`).join('');
+  seg.querySelectorAll('button').forEach(b=>b.onclick=()=>{confFlt=b.dataset.v;try{localStorage.setItem('audit-conf-flt',confFlt)}catch(e){};renderMain()});
+  m.appendChild(seg);
+  const groups={}; visible.forEach(it=>{const k=coKey(it.coName);(groups[k]=groups[k]||{name:it.coName,coId:it.coId,items:[]}).items.push(it)});
+  const order=Object.values(groups).sort((a,b)=>(a.coId?0:1)-(b.coId?0:1)||collator.compare(a.name,b.name));
+  const wrap=document.createElement('div'); wrap.className='list';
+  let shown=0;
+  order.forEach(g=>{
+    const its=g.items.filter(F[confFlt][1]); if(confFlt!=='all'&&!its.length)return; shown++;
+    const gm=g.items.filter(it=>!it.online), k=coKey(g.name), open=confOpen.has(k)||confFlt!=='all';
+    const card=document.createElement('div'); card.className='card';
+    const fin=g.items.filter(it=>it.kind==='fin'), ar=g.items.filter(it=>it.kind==='ar');
+    const tags=[fin.length?`금융 ${fin.length}${fin.some(it=>!it.online)?` (우편 ${fin.filter(it=>!it.online).length})`:''}`:'',ar.length?`채권채무 ${ar.length}`:''].filter(Boolean).join(' · ');
+    const allDone=gm.length&&gm.every(it=>it.dlv), repDone=g.items.every(it=>it.rep);
+    card.innerHTML=`<button type="button" class="c-toggle" aria-expanded="${open}"><span class="c-name">${esc(g.name)}${g.coId?'':' <span class="tag q">앱에 없는 회사</span>'}<span class="cf-sub">${esc(tags)}</span></span><span class="c-right"><span class="cf-pg">${[gm.length?`배달 ${gm.filter(it=>it.dlv).length}/${gm.length}`:'',`회신 ${g.items.filter(it=>it.rep).length}/${g.items.length}`].filter(Boolean).join(' · ')}</span>${allDone&&repDone?'<span class="tag">완료</span>':''}<span class="chev">▾</span></span></button><div class="c-body" ${open?'':'hidden'}></div>`;
+    const body=card.querySelector('.c-body');
+    card.querySelector('.c-toggle').onclick=e=>{const o=e.currentTarget.getAttribute('aria-expanded')!=='true';e.currentTarget.setAttribute('aria-expanded',o);body.hidden=!o;if(o)confOpen.add(k);else confOpen.delete(k)};
+    ['fin','ar'].forEach(kd=>{
+      const list2=its.filter(it=>it.kind===kd); if(!list2.length)return;
+      const h=document.createElement('div'); h.className='cf-h'; h.textContent=`${KIND[kd]}조회서`; body.appendChild(h);
+      list2.sort((a,b)=>(a.online?1:0)-(b.online?1:0)||collator.compare(a.no||'',b.no||'')||collator.compare(a.name,b.name)).forEach(it=>body.appendChild(itemRow(it,y)));
+    });
+    wrap.appendChild(card);
+  });
+  if(!shown){const p=document.createElement('p');p.className='fine';p.style.textAlign='center';p.textContent='이 조건에 맞는 조회처가 없어요';wrap.appendChild(p)}
+  m.appendChild(wrap);
+  renderReceiptFold(m,y);
+}
+function itemRow(it,y){
+  const r=document.createElement('div'); r.className='ci'+(it.rep?' done':'');
+  const sub=[it.online?'':[it.addr,it.zip?`(${it.zip})`:''].filter(Boolean).join(' '),it.person].filter(Boolean).join(' · ');
+  const trk=it.trk&&!it.trk.none&&it.trk.st?`<span class="trk ${it.dlv?'ok':''}">${esc(it.trk.st)}${it.trk.at?` · ${esc(it.trk.at.slice(5))}`:''}${it.trk.who?` · ${esc(it.trk.who)}`:''}</span>`:(it.dlv?`<span class="trk ok">배달완료${it.dlvAt?` · ${esc(it.dlvAt.slice(5))}`:''}</span>`:(it.trk&&it.trk.none?'<span class="trk">조회 결과 없음</span>':''));
+  r.innerHTML=`<div class="ci-h"><b>${esc(it.name)}${it.branch?` <span class="ci-br">${esc(it.branch)}</span>`:''}</b>${it.no?`<span class="tag gray">${esc(it.no)}</span>`:''}${it.online?'<span class="tag gray">온라인</span>':''}</div>
+    ${sub?`<div class="ci-s">${esc(sub)}${it.phone?` · <a href="tel:${esc(it.phone.replace(/[^\d+]/g,''))}">${esc(it.phone)}</a>`:''}</div>`:(it.phone?`<div class="ci-s"><a href="tel:${esc(it.phone.replace(/[^\d+]/g,''))}">${esc(it.phone)}</a></div>`:'')}
+    ${it.online?'':`<div class="ci-r">${it.reg?`<button type="button" class="regbtn" data-a="trk" aria-label="등기 ${esc(regFmt(it.reg))} 배달 조회">등기 ${esc(regFmt(it.reg))}</button>${trk}`:'<button type="button" class="linkbtn" data-a="edit">등기번호 넣기</button>'}${it.sent?`<span class="ci-d">발송 ${esc(it.sent.slice(5).replace('-','/'))}</span>`:''}</div>`}
+    <div class="ci-t">${it.online?'':`<button type="button" class="signbtn" data-a="dlv" aria-pressed="${!!it.dlv}">배달완료</button>`}<button type="button" class="signbtn" data-a="rep" aria-pressed="${!!it.rep}">회신</button>${it.rc?'<button type="button" class="editbtn" data-a="rc">영수증</button>':''}<button type="button" class="editbtn" data-a="edit" aria-label="${esc(it.name)} 고치기">✎</button></div>
+    ${it.note?`<div class="note">${esc(it.note)}</div>`:''}`;
+  r.querySelectorAll('[data-a]').forEach(b=>b.onclick=async()=>{
+    const a=b.dataset.a;
+    if(a==='dlv'){it.dlv=!it.dlv;it.dlvAt=it.dlv?(it.dlvAt||todayKey):'';confCommit(y)}
+    else if(a==='rep'){it.rep=!it.rep;it.repAt=it.rep?todayKey:'';confCommit(y)}
+    else if(a==='edit')editItem(it,y);
+    else if(a==='rc'){const rc=confY(y).receipts.find(x=>x.id===it.rc);if(rc)receiptPage(y,rc)}
+    else if(a==='trk'){
+      if(!NATIVE){openTrace(it.reg);return}
+      b.disabled=true; b.textContent='조회 중…';
+      const res=await trackItem(it); confCommit(y,res.ok?`${regFmt(it.reg)} · ${res.t.st||'조회됨'}`:'');
+      if(!res.ok)traceFail(it,res.err);
+    }
+  });
+  return r;
+}
+function traceFail(it,err){
+  openSheet(sh=>{
+    sh.innerHTML=`<div><h4>배달 상태를 못 가져왔어요</h4><div class="sub">${esc(err||'')}</div></div><p class="fine">우체국 페이지에서 직접 볼 수 있어요. 등기번호 ${esc(regFmt(it.reg))}로 바로 조회돼요.</p>
+      <div class="sheet-foot"><button type="button" class="btn" id="tfNo">닫기</button><button type="button" class="btn primary" id="tfGo">우체국 페이지 열기</button></div>`;
+    sh.querySelector('#tfNo').onclick=closeSheet; sh.querySelector('#tfGo').onclick=()=>{closeSheet();openTrace(it.reg)};
+  });
+}
+function editItem(it,y){
+  openSheet(sh=>{
+    sh.innerHTML=`<div><h4>${esc(it.name)}${it.branch?' '+esc(it.branch):''}</h4><div class="sub">${esc(it.coName)} · ${KIND[it.kind]}조회서${it.zip?` · 우편번호 ${esc(it.zip)}`:''}</div></div>
+      ${it.online?'':`<div class="two"><label class="f">등기번호 (13자리)<input id="eiReg" inputmode="numeric" value="${esc(regFmt(it.reg))}" placeholder="61001-0216-8719"></label><label class="f">발송일<input type="date" id="eiSent" value="${esc(it.sent||'')}"></label></div>`}
+      <label class="f">메모<textarea id="eiNote" placeholder="회신 독촉 전화함 등">${esc(it.note||'')}</textarea></label>
+      <label class="opt"><span>${it.online?'온라인 발급 (등기 관리에서 빠져요)':'우편 발송'}</span><button type="button" class="btn sm" id="eiOn">${it.online?'우편으로 바꾸기':'온라인으로 바꾸기'}</button></label>
+      ${it.reg&&!it.online?'<button type="button" class="btn" id="eiPage">우체국 조회 페이지 열기</button>':''}
+      <div class="sheet-foot"><button type="button" class="btn" id="eiNo">취소</button><button type="button" class="btn primary" id="eiOk">저장</button></div>`;
+    const q=s=>sh.querySelector(s);
+    q('#eiNo').onclick=closeSheet;
+    q('#eiOn').onclick=()=>{it.online=!it.online;closeSheet();confCommit(y)};
+    if(q('#eiPage'))q('#eiPage').onclick=()=>openTrace(it.reg);
+    q('#eiOk').onclick=()=>{
+      if(q('#eiReg')){const d=regDigits(q('#eiReg').value);if(d&&d.length!==13){q('#eiReg').setCustomValidity('13자리');q('#eiReg').reportValidity();return}
+        if(d!==regDigits(it.reg)){it.reg=d;it.trk=null;if(!d){it.dlv=false;it.dlvAt=''}if(d&&!it.sent)it.sent=todayKey}
+        it.sent=q('#eiSent').value||it.sent;}
+      it.note=q('#eiNote').value.trim(); closeSheet(); confCommit(y,'저장했어요');
+    };
+  });
+}
+function renderReceiptFold(m,y){
+  const C=confY(y); if(!C.receipts.length)return;
+  const d=document.createElement('details'); d.className='fold';
+  d.innerHTML=`<summary>등기 영수증 <span class="s">${C.receipts.length}장</span></summary><div class="rc-list"></div>`;
+  const L=d.querySelector('.rc-list');
+  C.receipts.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')||b.at-a.at).forEach(rc=>{
+    const b=document.createElement('button'); b.type='button'; b.className='rc-th';
+    b.innerHTML=`<span class="ph"></span><span class="t">${esc(rc.date?rc.date.slice(5).replace('-','/'):'날짜 없음')} · ${rc.lines.length}통</span>`;
+    pGet(rc.photo).then(bl=>{if(bl)b.querySelector('.ph').style.backgroundImage=`url("${URL.createObjectURL(bl)}")`;else b.querySelector('.ph').textContent='사진 받는 중'});
+    b.onclick=()=>receiptPage(y,rc); L.appendChild(b);
+  });
+  m.appendChild(d);
+}
+function pickReceipt(y){
+  openSheet(sh=>{
+    sh.innerHTML=`<div><h4>등기 영수증 추가</h4><div class="sub">사진에서 등기번호·우편번호를 읽어서 조회처에 붙여요. 다 읽은 뒤 사진을 보면서 고칠 수 있어요.</div></div>
+      <div class="opts"><label class="btn primary">카메라로 찍기<input type="file" accept="image/*" capture="environment" id="rcCam"></label><label class="btn">갤러리에서 고르기<input type="file" accept="image/*" id="rcGal"></label></div>
+      <div class="sheet-foot"><button type="button" class="btn" id="rcNo">취소</button></div>`;
+    sh.querySelector('#rcNo').onclick=closeSheet;
+    const go=async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;closeSheet();await newReceipt(y,f)};
+    sh.querySelector('#rcCam').onchange=go; sh.querySelector('#rcGal').onchange=go;
+  });
+}
+async function newReceipt(y,file){
+  const id=uid()+uid(), rc={id,photo:'p_'+id,date:'',lines:[],at:Date.now()};
+  const pg=receiptPage(y,rc,true);
+  try{
+    const {keep,ocr}=await prepReceipt(file); await pPut(rc.photo,keep); pg.setPhoto(keep);
+    const res=await readReceiptText(ocr,t=>pg.busy(t));
+    const p=parseReceipt(res); rc.date=p.date||todayKey; rc.lines=matchItems(p.lines,y);
+    pg.fill(p.lines.length?'':'등기번호를 못 찾았어요. 사진을 보면서 직접 넣어 주세요.');
+  }catch(e){pg.fill('사진을 읽지 못했어요. 직접 넣어 주세요.')}
+}
+/* 영수증 확인 화면: 위에 사진(확대·스크롤), 아래에 읽은 등기번호 — 원본과 비교하며 고쳐요 */
+function receiptPage(y,rc,isNew){
+  const C=confY(y), work=JSON.parse(JSON.stringify(rc)); let photoBlob=null, zoom=1;
+  const pg=document.createElement('div'); pg.className='rpage'; pg.setAttribute('role','dialog'); pg.setAttribute('aria-label','등기 영수증');
+  pg.innerHTML=`<div class="rbar"><button type="button" class="iconbtn" id="rpX" aria-label="닫기">✕</button><h3>등기 영수증</h3><button type="button" class="btn primary sm" id="rpOk">저장</button></div>
+    <div class="rpane" id="rpPane"><img alt="영수증 사진" id="rpImg"><div class="rzoom"><button type="button" class="btn sm" id="rpZo" aria-label="작게">−</button><button type="button" class="btn sm" id="rpZi" aria-label="크게">+</button></div></div>
+    <div class="rform" id="rpForm"><p class="fine" id="rpBusy"><span class="spin"></span> 사진 준비 중…</p></div>`;
+  document.body.appendChild(pg); document.body.style.overflow='hidden';
+  const q=s=>pg.querySelector(s), img=q('#rpImg');
+  const close=()=>{pg.remove();document.body.style.overflow='';rpClose=null};
+  rpClose=close;
+  q('#rpX').onclick=close;
+  const setZ=z=>{zoom=Math.max(1,Math.min(4,z));img.style.width=zoom*100+'%'};
+  q('#rpZi').onclick=()=>setZ(zoom+0.5); q('#rpZo').onclick=()=>setZ(zoom-0.5);
+  img.onclick=()=>setZ(zoom>1?1:2);
+  const setPhoto=b=>{photoBlob=b;img.src=URL.createObjectURL(b)};
+  if(!isNew)pGet(rc.photo).then(b=>{if(b)setPhoto(b);else q('#rpPane').insertAdjacentHTML('beforeend','<p class="fine" style="color:#ccc;padding:12px">사진을 아직 못 받았어요 · 인터넷 연결을 확인해 주세요</p>')});
+  const pool=C.items.filter(it=>!it.online);
+  const optHTML=sel=>{
+    const byCo={}; pool.forEach(it=>{(byCo[it.coName]=byCo[it.coName]||[]).push(it)});
+    return `<option value="">조회처 고르기</option>`+Object.keys(byCo).sort(collator.compare).map(co=>`<optgroup label="${esc(co)}">${byCo[co].map(it=>`<option value="${it.id}" ${it.id===sel?'selected':''}>${esc(it.name)}${it.branch?' '+esc(it.branch):''}${it.zip?` (${esc(it.zip)})`:''}${it.reg&&it.id!==sel?' · 등기 있음':''}</option>`).join('')}</optgroup>`).join('');
+  };
+  const draw=msg=>{
+    const f=q('#rpForm');
+    f.innerHTML=`${msg?`<p class="fine warn">${esc(msg)}</p>`:'<p class="fine">사진과 비교해서 등기번호가 맞는지 확인해 주세요. 우편번호가 같은 조회처는 자동으로 골라 뒀어요.</p>'}
+      <label class="f">접수일<input type="date" id="rpDate" value="${esc(work.date||'')}"></label>
+      <div class="rlines"></div><button type="button" class="btn" id="rpAdd">+ 등기번호 직접 추가</button>
+      ${isNew?'':'<button type="button" class="btn danger" id="rpDel">이 영수증 삭제</button>'}`;
+    const L=f.querySelector('.rlines');
+    work.lines.forEach((l,i)=>{
+      const it=pool.find(x=>x.id===l.item);
+      const row=document.createElement('div'); row.className='rline'+(l.item?'':' un');
+      row.innerHTML=`<div class="two"><label class="f">등기번호<input inputmode="numeric" data-k="reg" value="${esc(regFmt(l.reg))}"></label><label class="f">우편번호 · 받는 분<input data-k="zip" value="${esc([l.zip,l.name].filter(Boolean).join(' '))}" readonly tabindex="-1"></label></div>
+        <label class="f">조회처${l.item?'':' <b class="warn">· 골라 주세요</b>'}<select data-k="item">${optHTML(l.item)}</select></label>
+        ${l.doubt&&l.doubt.length&&l.reg.length===13?`<p class="fine warn">확인 필요 · 두 번 읽었더니 <b class="mono">${esc(regFmt([...l.reg].map((ch,i)=>l.doubt.includes(i)?'□':ch).join('')))}</b> 자리가 달랐어요 (${esc(regFmt(l.reg))} / ${esc(regFmt(l.alt||''))}) · 사진과 비교해 주세요</p>`:''}
+        ${it&&it.zip&&l.zip&&it.zip!==l.zip?'<p class="fine warn">우편번호가 리스트와 달라요 · 맞는지 확인해 주세요</p>':''}
+        <button type="button" class="linkbtn" data-k="del">이 줄 빼기</button>`;
+      row.querySelector('[data-k=reg]').oninput=e=>{l.reg=regDigits(e.target.value);l.doubt=null};
+      row.querySelector('[data-k=reg]').onblur=e=>{e.target.value=regFmt(l.reg)};
+      row.querySelector('[data-k=item]').onchange=e=>{l.item=e.target.value;draw()};
+      row.querySelector('[data-k=del]').onclick=()=>{work.lines.splice(i,1);draw()};
+      L.appendChild(row);
+    });
+    f.querySelector('#rpDate').onchange=e=>{work.date=e.target.value};
+    f.querySelector('#rpAdd').onclick=()=>{work.lines.push({reg:'',fee:'',zip:'',name:'',item:''});draw();const ins=f.querySelectorAll('[data-k=reg]');ins[ins.length-1].focus()};
+    const del=f.querySelector('#rpDel');
+    if(del)del.onclick=()=>{
+      C.items.forEach(it=>{if(it.rc===rc.id){it.rc=''}});
+      C.receipts=C.receipts.filter(x=>x.id!==rc.id); pDel(rc.photo); close(); confCommit(y,'영수증을 지웠어요 · 조회처에 넣은 등기번호는 그대로 둬요');
+    };
+  };
+  q('#rpOk').onclick=async()=>{
+    const bad=work.lines.find(l=>l.reg&&l.reg.length!==13); if(bad){toast(`등기번호 ${regFmt(bad.reg)}가 13자리가 아니에요`,false);return}
+    work.lines=work.lines.filter(l=>l.reg).map(l=>{const o=Object.assign({},l);delete o.doubt;delete o.alt;return o});
+    // 이 영수증에서 빠진 연결은 풀고, 새로 고른 조회처에 등기번호·발송일을 넣어요
+    C.items.forEach(it=>{if(it.rc===rc.id&&!work.lines.some(l=>l.item===it.id)){it.rc=''}});
+    let n=0;
+    work.lines.forEach(l=>{const it=C.items.find(x=>x.id===l.item);if(!it)return;if(regDigits(it.reg)!==l.reg){it.reg=l.reg;it.trk=null;it.dlv=false;it.dlvAt=''}it.sent=work.date||it.sent||todayKey;it.rc=rc.id;n++});
+    const saved={id:rc.id,photo:rc.photo,date:work.date,lines:work.lines,at:rc.at||Date.now()};
+    const i=C.receipts.findIndex(x=>x.id===rc.id); if(i>=0)C.receipts[i]=saved; else C.receipts.push(saved);
+    if(isNew&&photoBlob)photoUpload(rc.photo);
+    close(); confCommit(y,`영수증 저장 · ${n}곳에 등기번호를 넣었어요${work.lines.length>n?` · ${work.lines.length-n}건은 조회처를 안 골랐어요`:''}`);
+    if(NATIVE&&n)setTimeout(()=>trackAll(y,true),1500);
+  };
+  if(!isNew)draw();
+  return {setPhoto,busy:t=>{const b=q('#rpBusy');if(b)b.innerHTML=`<span class="spin"></span> ${esc(t)}`},fill:msg=>{work.lines=rc.lines;work.date=rc.date;draw(msg)}};
+}
+let rpClose=null;
+async function saveWb(wb,name){
+  const Cap=window.Capacitor;
+  try{
+    if(NATIVE){const {Filesystem,Share}=Cap.Plugins;const b64=XLSX.write(wb,{type:'base64',bookType:'xlsx'});const w=await Filesystem.writeFile({path:name,data:b64,directory:'CACHE'});try{await Share.share({title:name,files:[w.uri]})}catch(err){if(!/cancel/i.test(String(err&&err.message||err)))throw err}}
+    else{const blob=new Blob([XLSX.write(wb,{type:'array',bookType:'xlsx'})]);const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000)}
+  }catch(e){toast('파일을 저장하지 못했어요',false)}
+}
 
 /* excel export */
 $('exportBtn').onclick=async()=>{
@@ -1269,6 +1792,7 @@ render();
 initStore();
 setupWidgetSetting();
 loadSystemFont();
+setTimeout(autoTrack,4000);
 })();
 /* 안드로이드 앱: 웹 화면은 폰 글꼴 설정을 안 따라가서, 폰에 있는 기본 글꼴 파일을 직접 불러와 써요 */
 async function loadSystemFont(){
