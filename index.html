@@ -87,7 +87,7 @@ h1{font-size:22px;font-weight:700;margin:0;letter-spacing:-.01em}
 .legend{display:flex;gap:12px;font-size:11px;color:var(--muted);padding:0 4px}
 .legend span{display:inline-flex;align-items:center;gap:4px}
 .lg{display:inline-block;width:10px;height:10px;border-radius:3px;flex:none}
-.lg.field{background:var(--accent)} .lg.lobby{background:var(--warn)} .lg.agm{background:var(--danger)}
+.lg.field{background:var(--accent)} .lg.mid{background:var(--prog)} .lg.lobby{background:var(--warn)} .lg.agm{background:var(--danger)}
 .cgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .cdow{font-size:11px;text-align:center;color:var(--muted);padding:2px 0}
 .cdow.sun{color:var(--danger)} .cdow.sat{color:var(--prog)}
@@ -101,6 +101,7 @@ h1{font-size:22px;font-weight:700;margin:0;letter-spacing:-.01em}
 .cday.inrange{background:var(--accent-soft);box-shadow:inset 0 0 0 1.5px var(--accent)}
 .ev{font-size:10px;line-height:1.35;border-radius:4px;padding:0 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
 .ev.field{background:var(--accent);color:var(--accent-ink)}
+.ev.mid{background:var(--prog);color:var(--surface)}
 .ev.lobby{background:var(--warn-soft);color:var(--warn);box-shadow:inset 0 0 0 1px var(--warn)}
 .ev.lobby.done{background:var(--ok-soft);color:var(--ok);box-shadow:inset 0 0 0 1px var(--ok)}
 .ev.agm{background:transparent;color:var(--danger);box-shadow:inset 0 0 0 1px var(--danger)}
@@ -122,6 +123,9 @@ h1{font-size:22px;font-weight:700;margin:0;letter-spacing:-.01em}
 .chips2{display:flex;flex-wrap:wrap;gap:6px}
 .co-chip{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:14px;font-weight:600}
 .co-chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.pick-co.mid .co-chip[aria-pressed="true"]{background:var(--prog);border-color:var(--prog);color:var(--surface)}
+.ftype{align-self:flex-start}
+.ftype button[data-v="mid"][aria-pressed="true"]{background:var(--prog);color:var(--surface)}
 .fld-line{font-size:13px;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
 .fld-line b{font-size:12px;color:var(--muted);font-weight:500}
 .fld-list{display:flex;flex-wrap:wrap;gap:6px}
@@ -373,7 +377,7 @@ try{cur=localStorage.getItem(UI_KEY)}catch(e){}
 
 const yearsSorted=()=>Object.keys(state.years).sort();
 const list=()=>state.years[cur]||[];
-function blank(name){return {id:uid(),name:name||'',join:'',confirmOwner:'',confirm:'ready',reportOwner:'',sep:'todo',con:'todo',role:'none',parent:'',agm:'',lobbyOffset:state.settings.lobbyDays,signoff:false,note:'',field:[]}}
+function blank(name){return {id:uid(),name:name||'',join:'',confirmOwner:'',confirm:'ready',reportOwner:'',sep:'todo',con:'todo',role:'none',parent:'',agm:'',lobbyOffset:state.settings.lobbyDays,signoff:false,note:'',field:[],fieldMid:[]}}
 function norm(c){const b=blank();return Object.assign(b,c||{})}
 
 /* dates */
@@ -790,8 +794,8 @@ function card(c,prev){
     });
     body.appendChild(g);
   }
-  const fr=fieldRanges(c.field);
-  if(fr.length){const f=document.createElement('div');f.className='fld-line mono';f.innerHTML=`<b>필드</b>${fr.map(rangeTxt).join(', ')} <b>(${(c.field||[]).length}일)</b>`;body.appendChild(f)}
+  FTYPES.forEach(t=>{const ds=c[FT[t].key]||[], fr=fieldRanges(ds);
+    if(fr.length){const f=document.createElement('div');f.className='fld-line mono';f.innerHTML=`<b><i class="lg ${t}"></i> ${FT[t].lbl} 필드</b>${fr.map(rangeTxt).join(', ')} <b>(${ds.length}일)</b>`;body.appendChild(f)}});
   if(c.note){const n=document.createElement('div');n.className='note';n.textContent=c.note;body.appendChild(n)}
 
   const foot=document.createElement('div'); foot.className='c-foot';
@@ -885,6 +889,9 @@ const HOLIDAYS={
 const DOW=['일','월','화','수','목','금','토'];
 const keyOfD=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const isWork=k=>{const w=parseKey(k).getDay();return w!==0&&w!==6&&!HOLIDAYS[k]};
+const FT={mid:{key:'fieldMid',lbl:'중간'},field:{key:'field',lbl:'기말'}};
+const FTYPES=['mid','field'];
+const defaultFT=k=>{const m=parseKey(k).getMonth()+1;return m>=1&&m<=4?'field':'mid'};
 function fieldRanges(days){
   const ds=[...new Set(days||[])].sort(), out=[];
   ds.forEach(k=>{
@@ -901,10 +908,10 @@ function calEvents(comps){
   const ev={};
   const push=(k,e)=>{(ev[k]=ev[k]||[]).push(e)};
   comps.forEach(c=>{
-    (c.field||[]).forEach(k=>push(k,{t:'field',c}));
+    FTYPES.forEach(t=>(c[FT[t].key]||[]).forEach(k=>push(k,{t,c})));
     if(c.agm){push(c.agm,{t:'agm',c});const l=lobbyOf(c);if(l)push(l,{t:'lobby',c})}
   });
-  const rank={lobby:0,agm:1,field:2};
+  const rank={lobby:0,agm:1,mid:2,field:3};
   Object.values(ev).forEach(a=>a.sort((x,y)=>rank[x.t]-rank[y.t]||collator.compare(x.c.name,y.c.name)));
   return ev;
 }
@@ -917,7 +924,7 @@ function renderCalendar(m,comps){
   const {y,m:mo}=calView;
   const box=document.createElement('section'); box.className='calbox';
   box.innerHTML=`<div class="cal-head"><h2 class="mono">${y}. ${pad(mo)}</h2><div class="nav"><button type="button" class="cprev" aria-label="이전 달">‹</button><button type="button" class="ctoday">오늘</button><button type="button" class="cnext" aria-label="다음 달">›</button></div></div>
-    <div class="legend"><span><i class="lg field"></i>필드</span><span><i class="lg lobby"></i>Audit Lobby</span><span><i class="lg agm"></i>주총</span></div>
+    <div class="legend"><span><i class="lg mid"></i>중간 필드</span><span><i class="lg field"></i>기말 필드</span><span><i class="lg lobby"></i>Audit Lobby</span><span><i class="lg agm"></i>주총</span></div>
     <div class="cgrid"></div><p class="fine">날짜를 누르면 그날 일정을 보고 필드를 추가할 수 있어요. 여러 날은 시작일을 꾹 누른 채 끝나는 날까지 끌어 주세요.</p>`;
   box.querySelector('.cprev').onclick=()=>{calView.m--;if(calView.m<1){calView.m=12;calView.y--}renderMain()};
   box.querySelector('.cnext').onclick=()=>{calView.m++;if(calView.m>12){calView.m=1;calView.y++}renderMain()};
@@ -944,8 +951,9 @@ function renderCalendar(m,comps){
   ag.innerHTML=`<h3>${mo}월 일정</h3>`;
   if(!ks.length)ag.innerHTML+=`<p class="fine">이 달에는 일정이 없어요.</p>`;
   const ym=`${y}-${pad(mo)}-`, rangeAt={};
-  comps.forEach(c=>fieldRanges(c.field).forEach(r=>{const days=(c.field||[]).filter(k=>k>=r[0]&&k<=r[1]&&k.startsWith(ym));if(days.length)rangeAt[c.id+'|'+days[0]]={r,n:(c.field||[]).filter(k=>k>=r[0]&&k<=r[1]).length};}));
-  const agEv=k=>ev[k].filter(e=>e.t!=='field'||rangeAt[e.c.id+'|'+k]);
+  const isF=t=>t==='field'||t==='mid';
+  comps.forEach(c=>FTYPES.forEach(t=>{const all=c[FT[t].key]||[];fieldRanges(all).forEach(r=>{const days=all.filter(k=>k>=r[0]&&k<=r[1]&&k.startsWith(ym));if(days.length)rangeAt[c.id+'|'+t+'|'+days[0]]={r,n:all.filter(k=>k>=r[0]&&k<=r[1]).length};})}));
+  const agEv=k=>ev[k].filter(e=>!isF(e.t)||rangeAt[e.c.id+'|'+e.t+'|'+k]);
   ks.filter(k=>agEv(k).length).forEach(k=>{
     const row=document.createElement('div'); row.className='ag-row';
     const d=parseKey(k);
@@ -953,8 +961,8 @@ function renderCalendar(m,comps){
     const it=row.querySelector('.ag-items');
     agEv(k).forEach(e=>{
       const s=document.createElement('button'); s.type='button'; s.className='ag-it '+e.t;
-      const ri=e.t==='field'?rangeAt[e.c.id+'|'+k]:null;
-      s.innerHTML=`<i class="lg ${e.t}"></i>${esc(e.c.name)} <em>${e.t==='field'?'필드'+(ri&&ri.n>1?' '+rangeTxt(ri.r)+' ('+ri.n+'일)':''):e.t==='agm'?'주주총회':'Audit Lobby · '+(e.c.signoff?'Sign-off 완료':'Sign-off 전')}</em>`;
+      const ri=isF(e.t)?rangeAt[e.c.id+'|'+e.t+'|'+k]:null;
+      s.innerHTML=`<i class="lg ${e.t}"></i>${esc(e.c.name)} <em>${isF(e.t)?FT[e.t].lbl+' 필드'+(ri&&ri.n>1?' '+rangeTxt(ri.r)+' ('+ri.n+'일)':''):e.t==='agm'?'주주총회':'Audit Lobby · '+(e.c.signoff?'Sign-off 완료':'Sign-off 전')}</em>`;
       s.onclick=()=>openDay(k,comps);
       it.appendChild(s);
     });
@@ -992,24 +1000,34 @@ function bindCalDrag(grid,comps){
 }
 function pickCompanies(sh,comps,days,label){
   const box=document.createElement('div'); box.className='pick-co';
-  box.innerHTML=`<div class="f">${label}</div><div class="chips2"></div>`;
+  box.innerHTML=`<div class="seg small ftype" role="group" aria-label="필드 구분"><button type="button" data-v="mid">중간</button><button type="button" data-v="field">기말</button></div><div class="f">${label}</div><div class="chips2"></div>`;
+  let ft=defaultFT(days[0]);
+  const sg=box.querySelector('.ftype');
+  sg.onclick=e=>{const b=e.target.closest('button');if(!b)return;ft=b.dataset.v;draw()};
   const ch=box.querySelector('.chips2');
   const cands=comps.filter(c=>c.join==='y').slice().sort((a,b)=>collator.compare(a.name,b.name));
+  const draw=()=>{
+  sg.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===ft));
+  box.classList.toggle('mid',ft==='mid');
+  const fk=FT[ft].key, fl=FT[ft].lbl;
+  ch.innerHTML='';
   if(!cands.length)ch.innerHTML='<span class="fine">참여하는 회사가 없어요.</span>';
   cands.forEach(c=>{
-    const has=days.every(k=>(c.field||[]).includes(k));
+    const has=days.every(k=>(c[fk]||[]).includes(k));
     const b=document.createElement('button'); b.type='button'; b.className='co-chip'; b.setAttribute('aria-pressed',has);
     b.textContent=c.name;
     b.onclick=()=>{
       snapshot();
       const t=state.years[cur].find(x=>x.id===c.id);
-      const set=new Set(t.field||[]);
+      const set=new Set(t[fk]||[]);
       if(has)days.forEach(k=>set.delete(k)); else days.forEach(k=>set.add(k));
-      t.field=[...set].sort();
-      closeSheet(); commit(has?`${c.name} 필드 ${days.length}일 지웠어요`:`${c.name} 필드 ${days.length}일 넣었어요`);
+      t[fk]=[...set].sort();
+      closeSheet(); commit(has?`${c.name} ${fl} 필드 ${days.length}일 지웠어요`:`${c.name} ${fl} 필드 ${days.length}일 넣었어요`);
     };
     ch.appendChild(b);
   });
+  };
+  draw();
   sh.appendChild(box);
 }
 function openDay(k,comps){
@@ -1020,7 +1038,7 @@ function openDay(k,comps){
       const l=document.createElement('div'); l.className='day-ev';
       ev.forEach(e=>{
         const r=document.createElement('div'); r.className='de-row';
-        r.innerHTML=`<i class="lg ${e.t}"></i><b>${esc(e.c.name)}</b><span>${e.t==='field'?'필드':e.t==='agm'?'주주총회':'Audit Lobby · '+(e.c.signoff?'Sign-off 완료':'Sign-off 전')}</span>`;
+        r.innerHTML=`<i class="lg ${e.t}"></i><b>${esc(e.c.name)}</b><span>${FT[e.t]?FT[e.t].lbl+' 필드':e.t==='agm'?'주주총회':'Audit Lobby · '+(e.c.signoff?'Sign-off 완료':'Sign-off 전')}</span>`;
         if(e.t==='lobby'){const b=document.createElement('button');b.type='button';b.className='signbtn';b.setAttribute('aria-pressed',!!e.c.signoff);b.textContent=e.c.signoff?'Sign-off ✓':'Sign-off';b.onclick=()=>{closeSheet();setField(e.c,'signoff',!e.c.signoff,e.c.signoff?`${e.c.name} Sign-off 취소`:`${e.c.name} Sign-off 완료`)};r.appendChild(b)}
         l.appendChild(r);
       });
@@ -1089,7 +1107,8 @@ function openEdit(id){
           <label class="f">주주총회일<input id="eAgm" type="date" value="${esc(c.agm)}"></label>
           <div class="f">Audit lobby<span class="inline">주총 <input id="eOff" type="number" min="0" max="60" inputmode="numeric" value="${esc(c.lobbyOffset)}"> 일 전</span><span id="eLobby" class="mono"></span></div>
         </div>
-        <div class="f">필드 일정<div class="fld-list" id="eFld"></div><div class="fld-add"><input type="date" id="eF1" aria-label="필드 시작일"><span>~</span><input type="date" id="eF2" aria-label="필드 종료일"><button type="button" class="btn" id="eFAdd">추가</button></div><span class="fine">주말·공휴일은 빼고 넣어요. 끝나는 날을 비우면 하루만 들어가요.</span></div>
+        <div class="f">중간감사 필드<div class="fld-list" id="eMFld"></div><div class="fld-add"><input type="date" id="eM1" aria-label="중간 필드 시작일"><span>~</span><input type="date" id="eM2" aria-label="중간 필드 종료일"><button type="button" class="btn" id="eMAdd">추가</button></div></div>
+        <div class="f">기말감사 필드<div class="fld-list" id="eFld"></div><div class="fld-add"><input type="date" id="eF1" aria-label="기말 필드 시작일"><span>~</span><input type="date" id="eF2" aria-label="기말 필드 종료일"><button type="button" class="btn" id="eFAdd">추가</button></div><span class="fine">주말·공휴일은 빼고 넣어요. 끝나는 날을 비우면 하루만 들어가요.</span></div>
         <label class="f">비고<textarea id="eNote">${esc(c.note)}</textarea></label>
       </div>
       <div class="sheet-foot"><button type="button" class="btn" id="eCancel">취소</button><button type="button" class="btn primary" id="eSave">${isNew?'추가':'저장'}</button></div>
@@ -1102,25 +1121,29 @@ function openEdit(id){
     const showParent=()=>{sh.querySelector('#eParentWrap').hidden=role!=='sub'};
     rb.onclick=e=>{const b=e.target.closest('button');if(!b)return;role=b.dataset.v;segSet(rb,role);showParent()};
     showParent();
-    c.field=(c.field||[]).slice();
-    const drawFld=()=>{
-      const box=sh.querySelector('#eFld'); box.innerHTML='';
-      const rs=fieldRanges(c.field);
-      if(!rs.length){box.innerHTML='<span class="fine">아직 없어요</span>';return}
-      rs.forEach(r=>{
-        const days=c.field.filter(k=>k>=r[0]&&k<=r[1]);
-        const ch=document.createElement('span'); ch.className='fld-chip mono'; ch.innerHTML=`${rangeTxt(r)} (${days.length}일)`;
-        const x=document.createElement('button'); x.type='button'; x.textContent='×'; x.setAttribute('aria-label',rangeTxt(r)+' 지우기');
-        x.onclick=()=>{c.field=c.field.filter(k=>!days.includes(k));drawFld()};
-        ch.appendChild(x); box.appendChild(ch);
-      });
+    const fldEditor=(fk,listId,i1,i2,addId,lbl)=>{
+      c[fk]=(c[fk]||[]).slice();
+      const draw=()=>{
+        const box=sh.querySelector(listId); box.innerHTML='';
+        const rs=fieldRanges(c[fk]);
+        if(!rs.length){box.innerHTML='<span class="fine">아직 없어요</span>';return}
+        rs.forEach(r=>{
+          const days=c[fk].filter(k=>k>=r[0]&&k<=r[1]);
+          const ch=document.createElement('span'); ch.className='fld-chip mono'; ch.innerHTML=`${rangeTxt(r)} (${days.length}일)`;
+          const x=document.createElement('button'); x.type='button'; x.textContent='×'; x.setAttribute('aria-label',lbl+' '+rangeTxt(r)+' 지우기');
+          x.onclick=()=>{c[fk]=c[fk].filter(k=>!days.includes(k));draw()};
+          ch.appendChild(x); box.appendChild(ch);
+        });
+      };
+      draw();
+      sh.querySelector(addId).onclick=()=>{
+        const a=sh.querySelector(i1).value, b=sh.querySelector(i2).value||a; if(!a){sh.querySelector(i1).focus();return}
+        const ds=a===b?[a]:workdaysBetween(a,b); c[fk]=[...new Set([...c[fk],...ds])].sort();
+        sh.querySelector(i1).value=''; sh.querySelector(i2).value=''; draw();
+      };
     };
-    drawFld();
-    sh.querySelector('#eFAdd').onclick=()=>{
-      const a=sh.querySelector('#eF1').value, b=sh.querySelector('#eF2').value||a; if(!a){sh.querySelector('#eF1').focus();return}
-      const ds=a===b?[a]:workdaysBetween(a,b); c.field=[...new Set([...c.field,...ds])].sort();
-      sh.querySelector('#eF1').value=''; sh.querySelector('#eF2').value=''; drawFld();
-    };
+    fldEditor('fieldMid','#eMFld','#eM1','#eM2','#eMAdd','중간');
+    fldEditor('field','#eFld','#eF1','#eF2','#eFAdd','기말');
     const lob=()=>{const a=sh.querySelector('#eAgm').value, o=Number(sh.querySelector('#eOff').value)||0;sh.querySelector('#eLobby').textContent=a?`→ ${md(addDays(a,-o))}까지`:''};
     sh.querySelector('#eAgm').oninput=lob; sh.querySelector('#eOff').oninput=lob; lob();
     sh.querySelector('#eCancel').onclick=closeSheet;
@@ -1134,7 +1157,7 @@ function openEdit(id){
       let t=isNew?c:arr.find(x=>x.id===c.id);
       const wasParent=t.role==='parent';
       Object.assign(t,{name,join,role,parent:role==='sub'?parent:'',confirmOwner:sh.querySelector('#eCO').value.trim(),reportOwner:sh.querySelector('#eRO').value.trim(),
-        agm:sh.querySelector('#eAgm').value,field:c.field,lobbyOffset:Number(sh.querySelector('#eOff').value)||0,note:sh.querySelector('#eNote').value.trim()});
+        agm:sh.querySelector('#eAgm').value,field:c.field,fieldMid:c.fieldMid,lobbyOffset:Number(sh.querySelector('#eOff').value)||0,note:sh.querySelector('#eNote').value.trim()});
       if(role==='sub'){const p=arr.find(x=>x.id===parent);if(p&&p.role!=='parent')p.role='parent'}
       if(wasParent&&role!=='parent')arr.forEach(x=>{if(x.role==='sub'&&x.parent===t.id){x.role='none';x.parent=''}});
       if(isNew)arr.push(t);
@@ -1163,7 +1186,7 @@ function openNewYear(y){
     sh.querySelector('#nyCancel').onclick=closeSheet;
     sh.querySelector('#nyGo').onclick=()=>{
       snapshot();
-      state.years[String(y)]=src.map(c=>Object.assign(norm(c),{join:'',confirm:'ready',sep:'todo',con:'todo',agm:'',signoff:false,note:'',field:[]}));
+      state.years[String(y)]=src.map(c=>Object.assign(norm(c),{join:'',confirm:'ready',sep:'todo',con:'todo',agm:'',signoff:false,note:'',field:[],fieldMid:[]}));
       cur=String(y); closeSheet(); commit(`FY${y}을 만들었어요`);
     };
   });
@@ -1175,7 +1198,7 @@ $('resetYearBtn').onclick=()=>{
     sh.innerHTML=`<div><h4>FY${cur} 진행 상황 초기화</h4><div class="sub">회사 목록, 참여 여부, 담당자, 연결 관계, Audit Lobby 며칠 전 설정은 그대로 두고 아래 항목만 비워요.</div></div>
       <div class="opts">
         <label class="opt"><span>조회서·별도·연결 상태, Sign-off</span><input type="checkbox" checked disabled></label>
-        <label class="opt"><span>필드 일정</span><input type="checkbox" id="rsField" checked></label>
+        <label class="opt"><span>필드 일정 (중간·기말)</span><input type="checkbox" id="rsField" checked></label>
         <label class="opt"><span>주주총회일</span><input type="checkbox" id="rsAgm" checked></label>
         <label class="opt"><span>비고</span><input type="checkbox" id="rsNote" checked></label>
       </div>
@@ -1184,7 +1207,7 @@ $('resetYearBtn').onclick=()=>{
     sh.querySelector('#rsYes').onclick=()=>{
       const f=sh.querySelector('#rsField').checked, a=sh.querySelector('#rsAgm').checked, n=sh.querySelector('#rsNote').checked;
       snapshot();
-      state.years[cur].forEach(c=>{c.confirm='ready';c.sep='todo';c.con='todo';c.signoff=false;if(f)c.field=[];if(a)c.agm='';if(n)c.note=''});
+      state.years[cur].forEach(c=>{c.confirm='ready';c.sep='todo';c.con='todo';c.signoff=false;if(f){c.field=[];c.fieldMid=[]}if(a)c.agm='';if(n)c.note=''});
       closeSheet(); commit(`FY${cur} 진행 상황을 초기화했어요`);
     };
   });
@@ -1217,7 +1240,7 @@ function readSheet(ws){
   for(let c=range.s.c;c<=range.e.c;c++){const v=norm(cellVal(ws,hr,c));if(v&&!(v in head))head[v]=c}
   const col=(...names)=>{for(const n of names){const k=n.replace(/\s/g,'').toLowerCase();if(k in head)return head[k]}return -1};
   const C={name:col('구분','회사','회사명'),join:col('참여여부','참여'),co:col('조회서'),mail:col('메일발송'),post:col('우편발송'),reply:col('회신','회신여부'),
-    ro:col('보고서'),sep:col('별도'),con:col('연결'),lobby:col('auditlobby','lobby'),sign:col('sign-off','signoff'),agm:col('주주총회','주총'),note:col('비고'),grp:col('연결그룹'),fld:col('필드')};
+    ro:col('보고서'),sep:col('별도'),con:col('연결'),lobby:col('auditlobby','lobby'),sign:col('sign-off','signoff'),agm:col('주주총회','주총'),note:col('비고'),grp:col('연결그룹'),fld:col('기말필드','필드'),fmid:col('중간필드')};
   if(C.note<0&&C.agm>=0)C.note=C.agm+1;
   const g=(r,k)=>C[k]>=0?cellVal(ws,r,C[k]):null;
   const out=[], parentByName={};
@@ -1236,8 +1259,9 @@ function readSheet(ws){
     c.signoff=str(g(r,'sign')).toUpperCase()==='O';
     c.agm=dateKey(g(r,'agm'));
     c.note=str(g(r,'note'));
-    const fl=str(g(r,'fld'));
-    if(fl){const ds=[];fl.split(/[,\n]/).forEach(part=>{const m=part.trim().match(/^(\d{4}-\d{2}-\d{2})(?:\s*~\s*(\d{4}-\d{2}-\d{2}))?$/);if(!m)return;if(!m[2])ds.push(m[1]);else workdaysBetween(m[1],m[2]).forEach(k=>ds.push(k))});c.field=[...new Set(ds)].sort()}
+    const parseFld=fl=>{const ds=[];fl.split(/[,\n]/).forEach(part=>{const m=part.trim().match(/^(\d{4}-\d{2}-\d{2})(?:\s*~\s*(\d{4}-\d{2}-\d{2}))?$/);if(!m)return;if(!m[2])ds.push(m[1]);else workdaysBetween(m[1],m[2]).forEach(k=>ds.push(k))});return [...new Set(ds)].sort()};
+    const fl=str(g(r,'fld')); if(fl)c.field=parseFld(fl);
+    const fm=str(g(r,'fmid')); if(fm)c.fieldMid=parseFld(fm);
     const grp=str(g(r,'grp'));
     if(grp==='연결 작성')c.role='parent';
     else if(grp.startsWith('종속:'))c._parentName=grp.slice(3).trim();
@@ -1864,7 +1888,7 @@ $('exportBtn').onclick=async()=>{
   const wb=XLSX.utils.book_new();
   yearsSorted().forEach(y=>{
     const arr=ordered(state.years[y]), names=Object.fromEntries(state.years[y].map(c=>[c.id,c.name]));
-    const aoa=[['구분','참여여부','조회서','메일발송','우편발송','회신','보고서','별도','연결','Audit lobby','Sign-off','주주총회','비고','연결그룹','필드']];
+    const aoa=[['구분','참여여부','조회서','메일발송','우편발송','회신','보고서','별도','연결','Audit lobby','Sign-off','주주총회','비고','연결그룹','중간필드','기말필드']];
     arr.forEach((c,i)=>{
       const r=i+2;
       const D=c.confirm==='na'?'N/A':['sent','partial','done'].includes(c.confirm)?'O':'';
@@ -1874,10 +1898,11 @@ $('exportBtn').onclick=async()=>{
       aoa.push([c.name,c.join==='y'?'O':c.join==='n'?'X':'',c.confirmOwner,D,c.confirm==='na'?'N/A':'',F,c.reportOwner,rep(c.sep),c.role==='parent'?rep(c.con)||'진행 전':'N/A',
         c.agm?{t:'n',f:`L${r}-${Number(c.lobbyOffset)||0}`,z:'yyyy-mm-dd'}:'',c.signoff?'O':'',agm,c.note,
         c.role==='parent'?'연결 작성':c.role==='sub'&&names[c.parent]?'종속: '+names[c.parent]:'',
+        fieldRanges(c.fieldMid).map(r=>r[0]===r[1]?r[0]:r[0]+'~'+r[1]).join(', '),
         fieldRanges(c.field).map(r=>r[0]===r[1]?r[0]:r[0]+'~'+r[1]).join(', ')]);
     });
     const ws=XLSX.utils.aoa_to_sheet(aoa);
-    ws['!cols']=[14,8,8,8,8,10,8,8,8,12,8,12,40,16,30].map(w=>({wch:w}));
+    ws['!cols']=[14,8,8,8,8,10,8,8,8,12,8,12,40,16,30,30].map(w=>({wch:w}));
     XLSX.utils.book_append_sheet(wb,ws,y);
   });
   const buf=XLSX.write(wb,{type:'array',bookType:'xlsx'});
