@@ -11,7 +11,10 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import java.io.File;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
@@ -28,10 +31,14 @@ import java.util.Locale;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-/** 홈 화면 위젯: 앱이 저장해 둔 요약으로 진행률과 Sign-off 급한 회사를 보여줘요. */
+/** 홈 화면 위젯: 앱이 저장해 둔 요약으로 진행률과 다가오는 일정(필드 · 주총 · Audit Lobby)을 보여줘요. */
 public class AuditWidget extends AppWidgetProvider {
     static final String PREFS = "audit_widget";
     static final String KEY = "summary";
+    static final String CHAR_FILE = "widget_char.png";
+    private static final int[][] UP_IDS = {
+        {R.id.up0, R.id.upd0, R.id.upt0, R.id.upr0}, {R.id.up1, R.id.upd1, R.id.upt1, R.id.upr1}, {R.id.up2, R.id.upd2, R.id.upt2, R.id.upr2}
+    };
     private static final int[][] CELL_IDS = {
         {R.id.k0, R.id.v0, R.id.p0}, {R.id.k1, R.id.v1, R.id.p1},
         {R.id.k2, R.id.v2, R.id.p2}, {R.id.k3, R.id.v3, R.id.p3}
@@ -63,6 +70,13 @@ public class AuditWidget extends AppWidgetProvider {
         try { if (raw != null) alpha = new JSONObject(raw).optInt("alpha", 100); } catch (Exception ignored) { }
         rv.setInt(R.id.bg, "setImageAlpha", Math.round(Math.max(0, Math.min(100, alpha)) * 2.55f));
         // 배경이 절반 이상 투명하면 글자를 배경화면에 맞춰 흰색/검정으로 바꿔요
+        // 앱 설정에서 고른 캐릭터 그림(폰 안에만 저장)
+        try {
+            File cf = new File(ctx.getFilesDir(), CHAR_FILE);
+            Bitmap bm = cf.exists() ? BitmapFactory.decodeFile(cf.getAbsolutePath()) : null;
+            if (bm != null) { rv.setImageViewBitmap(R.id.char_img, bm); rv.setViewVisibility(R.id.char_img, View.VISIBLE); }
+            else rv.setViewVisibility(R.id.char_img, View.GONE);
+        } catch (Exception e) { rv.setViewVisibility(R.id.char_img, View.GONE); }
         if (alpha <= 50) {
             int mode = 0;
             try { if (raw != null) mode = new JSONObject(raw).optInt("textMode", 0); } catch (Exception ignored) { }
@@ -72,12 +86,13 @@ public class AuditWidget extends AppWidgetProvider {
             rv.setTextColor(R.id.title, ink);
             rv.setTextColor(R.id.sub, muted);
             for (int[] c : CELL_IDS) { rv.setTextColor(c[0], muted); rv.setTextColor(c[1], ink); }
+            for (int[] u : UP_IDS) { rv.setTextColor(u[2], ink); rv.setTextColor(u[3], muted); }
         }
         if (raw == null) {
             rv.setTextViewText(R.id.title, "기말감사");
             rv.setTextViewText(R.id.sub, "");
             rv.setViewVisibility(R.id.cells, View.GONE);
-            rv.setViewVisibility(R.id.alert_row, View.GONE);
+            hideUp(rv);
             rv.setViewVisibility(R.id.ok_text, View.VISIBLE);
             rv.setTextViewText(R.id.ok_text, "앱을 열고 엑셀을 불러오면 여기에 진행률이 보여요");
             return rv;
@@ -103,44 +118,52 @@ public class AuditWidget extends AppWidgetProvider {
                 rv.setProgressBar(CELL_IDS[i][2], Math.max(b, 1), b == 0 ? 0 : a, false);
             }
 
-            // 주총 10일 이내(지난 지 2주 이내 포함)인데 Sign-off 전인 회사
-            JSONArray pend = o.optJSONArray("pending");
-            List<long[]> list = new ArrayList<>();
-            List<String> names = new ArrayList<>();
-            if (pend != null) {
-                for (int i = 0; i < pend.length(); i++) {
-                    JSONObject p = pend.optJSONObject(i);
-                    if (p == null) continue;
-                    long d = daysUntil(p.optString("agm", ""));
-                    if (d == Long.MIN_VALUE || d > 10 || d < -14) continue;
-                    list.add(new long[]{d, names.size()});
-                    names.add(p.optString("n", ""));
+            // 다가오는 일정: 앱이 날짜와 이름을 넘겨주고, D-day는 위젯이 오늘 기준으로 다시 계산해요
+            JSONArray up = o.optJSONArray("up");
+            int shown = 0;
+            hideUp(rv);
+            if (up != null) {
+                for (int i = 0; i < up.length() && shown < 3; i++) {
+                    JSONObject e = up.optJSONObject(i);
+                    if (e == null) continue;
+                    long ds = daysUntil(e.optString("s", "")), de = daysUntil(e.optString("e", e.optString("s", "")));
+                    if (ds == Long.MIN_VALUE || de < 0) continue;
+                    int[] ids = UP_IDS[shown];
+                    rv.setViewVisibility(ids[0], View.VISIBLE);
+                    if (ds <= 0) {
+                        rv.setTextViewText(ids[1], "오늘");
+                        rv.setTextColor(ids[1], ctx.getResources().getColor(R.color.w_danger));
+                        rv.setTextViewText(ids[3], de > 0 ? "~" + md(e.optString("e", "")) : "");
+                    } else {
+                        rv.setTextViewText(ids[1], md(e.optString("s", "")));
+                        rv.setTextColor(ids[1], ctx.getResources().getColor(R.color.w_accent));
+                        rv.setTextViewText(ids[3], "D-" + ds);
+                    }
+                    rv.setTextViewText(ids[2], e.optString("t", ""));
+                    shown++;
                 }
             }
-            if (list.isEmpty()) {
-                rv.setViewVisibility(R.id.alert_row, View.GONE);
+            if (shown == 0) {
                 rv.setViewVisibility(R.id.ok_text, View.VISIBLE);
-                rv.setTextViewText(R.id.ok_text, "주총 10일 안에 Sign-off 급한 회사 없음");
-            } else {
-                Collections.sort(list, (x, y) -> Long.compare(x[0], y[0]));
-                SpannableStringBuilder sb = new SpannableStringBuilder();
-                for (int i = 0; i < list.size(); i++) {
-                    if (i > 0) sb.append(" · ");
-                    long d = list.get(i)[0];
-                    sb.append(names.get((int) list.get(i)[1])).append(" ");
-                    sb.append(d == 0 ? "D-day" : d > 0 ? "D-" + d : "지남");
-                }
-                sb.setSpan(new StyleSpan(Typeface.BOLD), 0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                rv.setViewVisibility(R.id.ok_text, View.GONE);
-                rv.setViewVisibility(R.id.alert_row, View.VISIBLE);
-                rv.setTextViewText(R.id.alert_names, sb);
-            }
+                rv.setTextViewText(R.id.ok_text, "다가오는 일정이 없어요");
+            } else rv.setViewVisibility(R.id.ok_text, View.GONE);
         } catch (Exception e) {
-            rv.setViewVisibility(R.id.alert_row, View.GONE);
+            hideUp(rv);
             rv.setViewVisibility(R.id.ok_text, View.VISIBLE);
             rv.setTextViewText(R.id.ok_text, "앱을 한 번 열어 주세요");
         }
         return rv;
+    }
+
+    private static void hideUp(RemoteViews rv) {
+        for (int[] u : UP_IDS) rv.setViewVisibility(u[0], View.GONE);
+    }
+
+    private static String md(String key) {
+        try {
+            Date d = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA).parse(key);
+            return d == null ? "" : new SimpleDateFormat("M/d", Locale.KOREA).format(d);
+        } catch (Exception e) { return ""; }
     }
 
     private static boolean wallpaperIsDark(Context ctx) {

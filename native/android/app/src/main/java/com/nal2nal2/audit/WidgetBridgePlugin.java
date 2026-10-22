@@ -3,6 +3,14 @@ package com.nal2nal2.audit;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
+import androidx.core.content.pm.ShortcutInfoCompat;
+import androidx.core.content.pm.ShortcutManagerCompat;
+import androidx.core.graphics.drawable.IconCompat;
+import java.io.File;
+import java.io.FileOutputStream;
 import com.getcapacitor.JSObject;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -78,5 +86,40 @@ public class WidgetBridgePlugin extends Plugin {
         } catch (Exception e) {
             call.reject("우체국에 연결하지 못했어요");
         } finally { if (c != null) c.disconnect(); }
+    }
+
+    /** 위젯에 넣을 캐릭터 그림을 앱 안에만 저장해요. data가 비면 지워요. */
+    @PluginMethod
+    public void setChar(PluginCall call) {
+        String data = call.getString("data", "");
+        File f = new File(getContext().getFilesDir(), AuditWidget.CHAR_FILE);
+        try {
+            if (data == null || data.isEmpty()) { if (f.exists()) f.delete(); }
+            else {
+                byte[] bytes = Base64.decode(data, Base64.DEFAULT);
+                try (FileOutputStream os = new FileOutputStream(f)) { os.write(bytes); }
+            }
+            AuditWidget.refreshAll(getContext());
+            call.resolve();
+        } catch (Exception e) { call.reject("그림을 저장하지 못했어요"); }
+    }
+
+    /** 내가 고른 그림으로 홈 화면 바로가기를 만들어요(앱 아이콘 자체는 바꿀 수 없어서). */
+    @PluginMethod
+    public void pinShortcut(PluginCall call) {
+        String data = call.getString("data", "");
+        String label = call.getString("label", "기말감사");
+        try {
+            if (!ShortcutManagerCompat.isRequestPinShortcutSupported(getContext())) { call.reject("이 폰 홈 화면은 바로가기 추가를 지원하지 않아요"); return; }
+            byte[] bytes = Base64.decode(data, Base64.DEFAULT);
+            Bitmap bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            if (bm == null) { call.reject("그림을 열지 못했어요"); return; }
+            Intent i = new Intent(getContext(), MainActivity.class);
+            i.setAction(Intent.ACTION_MAIN);
+            ShortcutInfoCompat info = new ShortcutInfoCompat.Builder(getContext(), "char_home")
+                .setShortLabel(label).setIcon(IconCompat.createWithBitmap(bm)).setIntent(i).build();
+            ShortcutManagerCompat.requestPinShortcut(getContext(), info, null);
+            call.resolve();
+        } catch (Exception e) { call.reject("바로가기를 만들지 못했어요"); }
     }
 }

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>기말 감사 체크</title>
-<meta name="theme-color" content="#1f5f4f">
+<meta name="theme-color" content="#4f8cff">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -28,21 +28,24 @@ body{margin:0;-webkit-tap-highlight-color:transparent}
 .wprev-card{border-radius:14px;padding:12px 14px;font-weight:600;color:var(--ink)}
 /* Layout: working-paper column — year tabs, progress strip, engagement cards grouped by consolidation, folded non-participating list */
 :root{
-  --bg:#f1f2ee; --surface:#ffffff; --ink:#18221f; --muted:#66706b; --line:#d9ddd5; --soft:#e9ece5;
-  --accent:#1f5f4f; --accent-ink:#ffffff; --accent-soft:#e1eee9;
-  --ok:#2f7d4f; --ok-soft:#e2f1e7; --warn:#b26b00; --warn-soft:#fbefd9; --prog:#2d5fb8; --prog-soft:#e3ebf9; --danger:#c0392b;
+  --bg:#f1f4f9; --surface:#ffffff; --ink:#1f2a44; --muted:#717c92; --line:#e1e7f0; --soft:#eef2f8;
+  --accent:#4f8cff; --accent-ink:#ffffff; --accent-soft:#e6efff;
+  --ok:#239768; --ok-soft:#dcf5ea; --warn:#c98a00; --warn-soft:#fff3cf; --prog:#3f78ea; --prog-soft:#e6efff; --danger:#e04d6e;
+  --pink:#e04d6e; --pink-soft:#ffe4ea; --mint:#6fd7a8; --rose:#ff9fb4; --yellow:#ffcf5c; --shadow:rgba(79,140,255,.11); --hello:#e6efff;
   /* 안드로이드에서는 sans-serif가 폰 설정의 글꼴(삼성 글꼴 스타일 포함)을 따라가요 */
   --f-body:-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
   --f-mono:var(--f-body);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#111614; --surface:#19201d; --ink:#e4ebe7; --muted:#97a39d; --line:#2b3531; --soft:#222b27;
-  --accent:#6fc3a8; --accent-ink:#0d1714; --accent-soft:#1e3a31;
-  --ok:#6fd096; --ok-soft:#1c3526; --warn:#f0b357; --warn-soft:#3a2c14; --prog:#86aef5; --prog-soft:#1d2a44; --danger:#ff8173; color-scheme:dark}}
+  --bg:#10151f; --surface:#182031; --ink:#e6ebf5; --muted:#9aa5bb; --line:#27324a; --soft:#202a3d;
+  --accent:#7aa8ff; --accent-ink:#0d1628; --accent-soft:#1f2f4d;
+  --ok:#6fd7a8; --ok-soft:#173a2d; --warn:#ffcf5c; --warn-soft:#3a3016; --prog:#8db4ff; --prog-soft:#1f2f4d; --danger:#ff8fa6;
+  --pink:#ff9fb4; --pink-soft:#3d2230; --mint:#5cc898; --rose:#e98aa0; --yellow:#e8bb4a; --shadow:rgba(0,0,0,.35); --hello:#1f2f4d; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#111614; --surface:#19201d; --ink:#e4ebe7; --muted:#97a39d; --line:#2b3531; --soft:#222b27;
-  --accent:#6fc3a8; --accent-ink:#0d1714; --accent-soft:#1e3a31;
-  --ok:#6fd096; --ok-soft:#1c3526; --warn:#f0b357; --warn-soft:#3a2c14; --prog:#86aef5; --prog-soft:#1d2a44; --danger:#ff8173; color-scheme:dark}
+  --bg:#10151f; --surface:#182031; --ink:#e6ebf5; --muted:#9aa5bb; --line:#27324a; --soft:#202a3d;
+  --accent:#7aa8ff; --accent-ink:#0d1628; --accent-soft:#1f2f4d;
+  --ok:#6fd7a8; --ok-soft:#173a2d; --warn:#ffcf5c; --warn-soft:#3a3016; --prog:#8db4ff; --prog-soft:#1f2f4d; --danger:#ff8fa6;
+  --pink:#ff9fb4; --pink-soft:#3d2230; --mint:#5cc898; --rose:#e98aa0; --yellow:#e8bb4a; --shadow:rgba(0,0,0,.35); --hello:#1f2f4d; color-scheme:dark}
 
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -305,22 +308,85 @@ h1{font-size:22px;font-weight:700;margin:0;letter-spacing:-.01em}
 .spin{display:inline-block;width:12px;height:12px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:sp 1s linear infinite;vertical-align:-1px}
 @keyframes sp{to{transform:rotate(360deg)}}
 @media (min-width:900px){.rpage{flex-direction:row;flex-wrap:wrap}.rbar{width:100%}.rpane{height:auto;flex:1 1 55%;min-height:0;max-height:calc(100vh - 60px)}.rform{flex:1 1 40%;max-height:calc(100vh - 60px)}}
+
+/* v2 디자인: 파스텔 블루 · 둥근 카드 · 아래 탭 */
+body{background:var(--bg)}
+.wrap{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
+header{align-items:center}
+header h1{font-size:24px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:6px}
+header h1::before{display:none!important}
+.char-top{width:52px;height:52px;object-fit:contain;margin:-10px 0 -10px -6px}
+.card,.fold,.empty,.strip{border:0!important;box-shadow:0 4px 18px var(--shadow);border-radius:18px!important}
+.strip{background:var(--surface)!important;gap:0!important}
+.cell{background:transparent!important;padding:12px 12px 11px!important}
+.cell .k{font-size:12px;font-weight:600}
+.cell .v{font-size:21px}
+.cell .bar{height:7px;border-radius:4px;background:var(--soft);margin-top:7px}
+.cell .bar i{border-radius:4px}
+.strip .cell:nth-child(1) .bar i{background:var(--accent)}
+.strip .cell:nth-child(2) .bar i{background:var(--mint)}
+.strip .cell:nth-child(3) .bar i{background:var(--rose)}
+.strip .cell:nth-child(4) .bar i{background:var(--yellow)}
+.views{position:fixed;left:0;right:0;bottom:0;z-index:9;border:0;border-radius:22px 22px 0 0;background:var(--surface);box-shadow:0 -6px 24px var(--shadow);gap:0;
+  padding:8px max(16px,env(safe-area-inset-right,0px),calc((100% - 560px)/2)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px),calc((100% - 560px)/2))}
+.views button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;padding:6px 0 2px;color:var(--muted);background:transparent;border-radius:12px}
+.views button svg{width:24px;height:24px}
+.views button[aria-pressed="true"]{color:var(--accent);background:transparent}
+.toast{bottom:calc(88px + env(safe-area-inset-bottom,0px))}
+.years{flex-wrap:nowrap}
+.years .osel{flex:1 1 0;min-width:0;border:0;box-shadow:0 2px 10px var(--shadow);border-radius:12px}
+.years .osel select{min-width:0;flex:1}
+.osel span{white-space:nowrap}
+.owner-row .osel,.osel{border-color:transparent}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.btn{border-radius:12px}
+.btn.primary{box-shadow:0 4px 12px var(--shadow)}
+.addbtn{border-radius:12px;background:var(--accent-soft)}
+.pill{border:0!important;padding:3px 12px;border-radius:9px}
+.pill.idle{background:var(--soft);color:var(--muted)}
+.pill.prog{background:var(--prog-soft);color:var(--prog)}
+.pill.warn{background:var(--pink-soft);color:var(--pink)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.mini i{border-radius:7px;border-width:0;background:var(--soft)}
+.mini i.ok{background:var(--mint);color:#fff}
+.mini i.prog{background:var(--prog-soft);color:var(--prog)}
+.mini i.warn{background:var(--pink-soft);color:var(--pink)}
+.tag{border-radius:8px}
+.ci{border:0;background:var(--soft);border-radius:14px}
+.regbtn{border:0;border-radius:9px}
+.signbtn{border-radius:9px}
+.signbtn[aria-pressed="true"]{background:var(--mint);border-color:var(--mint);color:#fff}
+.lg.mid,.ev.mid{background:var(--mint);color:#fff}
+.lg.field,.ev.field{background:var(--accent);color:var(--accent-ink)}
+.lg.lobby{background:var(--yellow)}.lg.agm{background:var(--rose)}
+.hello{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;background:var(--hello);border-radius:18px;padding:12px 6px 12px 16px;gap:6px}
+.hello .hk{display:block;font-size:12px;color:var(--accent);font-weight:700;margin-bottom:2px}
+.hello b{font-size:16px;display:block}
+.hello span{font-size:13px;color:var(--muted)}
+.hello img{width:82px;height:82px;object-fit:contain;margin:-14px -2px -12px 0}
+.charset{display:flex;flex-direction:column;gap:8px}
+.crow{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--soft);border-radius:14px;padding:8px 10px}
+.crow img{width:56px;height:56px;object-fit:contain;border-radius:10px;background:var(--surface)}
+.crow b{display:block;font-size:14px}
+.crow .fine{display:block}
+.crow .acts{display:flex;gap:6px}
 </style>
 </head>
 <body>
 
 <div class="wrap">
   <header>
-    <h1>기말 감사 체크</h1>
+    <h1><img class="char-top" id="charTop" src="char-default.png" alt="">기말감사</h1>
     <span class="status" id="status">불러오는 중…</span>
   </header>
 
   <nav class="years" id="years" aria-label="회계연도"></nav>
-  <div class="views" id="views" role="group" aria-label="보기"><button type="button" data-v="list">목록</button><button type="button" data-v="cal">달력</button><button type="button" data-v="conf">조회서</button></div>
+  <nav class="views" id="views" aria-label="메뉴"><button type="button" data-v="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg><span>목록</span></button><button type="button" data-v="cal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><span>달력</span></button><button type="button" data-v="conf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="6" width="17" height="13" rx="3"/><path d="M4 8l8 5.5L20 8"/></svg><span>조회서</span></button><button type="button" data-v="set"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/></svg><span>설정</span></button></nav>
 
   <div id="main"></div>
 
   <section class="more">
+    <div class="charset" id="charSet"></div>
     <div class="wset" id="widgetSet" hidden>
       <h3>홈 화면 위젯</h3>
       <label class="wrow" for="wAlpha"><span>배경 투명도</span><input type="range" id="wAlpha" min="0" max="100" step="5"><b id="wAlphaTxt" class="mono"></b></label>
@@ -573,6 +639,7 @@ function pushWidget(){
       alpha:widgetAlpha(), textMode:widgetText(),
       cells:[['조회서',n(c=>c.confirm==='done'||c.confirm==='na'),inn.length],['별도',n(c=>c.sep==='done'),inn.length],['연결',parents.filter(c=>c.con==='done').length,parents.length],['Lobby',n(c=>c.signoff),inn.length]],
       pending:inn.filter(c=>!c.signoff&&c.agm).map(c=>({n:c.name,agm:c.agm})),
+      up:upcoming(arr.filter(c=>c.join!=='n'&&own(c)),8).map(x=>({s:x.s,e:x.e,t:x.t})),
       updated:new Date().toISOString()};
     const j=JSON.stringify(Object.assign({},data,{updated:''}));
     if(j===widgetLast)return; widgetLast=j;
@@ -600,6 +667,68 @@ function ordered(arr){
 const byId=id=>list().find(c=>c.id===id);
 const subsOf=c=>list().filter(s=>s.role==='sub'&&s.parent===c.id);
 
+/* 가장 가까운 일정: 중간·기말 필드, 주총, Audit Lobby(Sign-off 전) — 진행 중인 필드가 먼저 */
+function upcoming(comps,limit){
+  const out=[];
+  comps.filter(c=>c.join!=='n').forEach(c=>{
+    [['fieldMid','중간 필드'],['field','기말 필드']].forEach(([k,lb])=>fieldRanges(c[k]).forEach(r=>{if(r[1]>=todayKey)out.push({s:r[0],e:r[1],n:r[2],t:`${c.name} ${lb}`})}));
+    if(c.agm&&c.agm>=todayKey)out.push({s:c.agm,e:c.agm,t:`${c.name} 주총`});
+    const lb=lobbyOf(c); if(lb&&lb>=todayKey&&!c.signoff)out.push({s:lb,e:lb,t:`${c.name} Audit Lobby`});
+  });
+  const key=x=>x.s<todayKey?todayKey:x.s;
+  out.sort((a,b)=>key(a).localeCompare(key(b))||a.s.localeCompare(b.s)||a.t.localeCompare(b.t));
+  return out.slice(0,limit||8);
+}
+function evWhen(x){
+  if(x.s<=todayKey)return {head:'오늘',tail:x.e>x.s?`${md(x.s)}~${md(x.e)}${x.n?` (${x.n}일)`:''}`:'오늘'};
+  return {head:dday(x.s).txt,tail:x.e>x.s?`${md(x.s)}~${md(x.e)}${x.n?` (${x.n}일)`:''}`:md(x.s)};
+}
+function helloCard(L){
+  const d=document.createElement('div'); d.className='hello';
+  const ev=upcoming(L,2), inn=L.filter(c=>c.join==='y').length;
+  let main='다가오는 일정이 없어요', sub='필드 일정이나 주총일을 넣으면 여기에 가장 가까운 일정이 보여요';
+  if(ev[0]){const w=evWhen(ev[0]);main=`${w.head} · ${ev[0].t}`;sub=w.tail;
+    if(ev[1]){const w2=evWhen(ev[1]);sub+=` · 다음: ${ev[1].t} ${ev[1].s<=todayKey?'진행 중':md(ev[1].s)+' ('+w2.head+')'}`}}
+  d.innerHTML=`<div><small class="hk">FY${esc(cur)} · 참여 ${inn}곳</small><b>${esc(main)}</b><span>${esc(sub)}</span></div><img alt="" src="${charSrc('card')}">`;
+  return d;
+}
+/* 캐릭터 그림: 설정에서 고른 그림은 이 기기에만 저장해요(동기화·백업·앱 파일에 안 들어가요) */
+const CHAR_K={top:'audit-char-top',card:'audit-char-card'};
+function charSrc(k){try{return localStorage.getItem(CHAR_K[k])||'char-default.png'}catch(e){return 'char-default.png'}}
+function applyChars(){const t=$('charTop');if(t)t.src=charSrc('top');document.querySelectorAll('.hello img').forEach(i=>{i.src=charSrc('card')})}
+function charToWidget(){
+  const W=window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform()&&Capacitor.Plugins&&Capacitor.Plugins.WidgetBridge; if(!W||!W.setChar)return;
+  let d=''; try{d=localStorage.getItem(CHAR_K.card)||''}catch(e){}
+  W.setChar({data:d?d.split(',')[1]:''}).catch(()=>{});
+}
+async function readChar(file){
+  const u=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=u});
+    const sc=Math.min(1,320/Math.max(img.naturalWidth,img.naturalHeight)), c=document.createElement('canvas');
+    c.width=Math.max(1,Math.round(img.naturalWidth*sc)); c.height=Math.max(1,Math.round(img.naturalHeight*sc));
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height); return c.toDataURL('image/png');
+  }finally{URL.revokeObjectURL(u)}
+}
+function setupChars(){
+  const box=$('charSet'); if(!box)return;
+  const native=window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform();
+  const draw=()=>{
+    box.innerHTML=`<h3>캐릭터 그림</h3>
+      ${[['top','머리글','앱 맨 위 제목 옆'],['card','일정 카드','가장 가까운 일정 옆'+(native?' · 홈 화면 위젯에도':'')]].map(([k,t,d])=>`<div class="crow"><img src="${charSrc(k)}" alt="${t} 그림"><div><b>${t}</b><span class="fine">${d}</span></div><div class="acts"><label class="btn sm">고르기<input type="file" accept="image/*" data-k="${k}"></label>${localStorage.getItem(CHAR_K[k])?`<button type="button" class="btn sm" data-r="${k}">기본</button>`:''}</div></div>`).join('')}
+      ${native&&localStorage.getItem(CHAR_K.top)?'<button type="button" class="btn" id="charPin">머리글 그림으로 홈 화면 바로가기 만들기</button>':''}
+      <p class="fine">고른 그림은 이 기기에만 저장돼요. 동기화나 엑셀 백업에 들어가지 않아서 다른 기기에서는 따로 골라야 해요. 배경이 투명한 PNG가 제일 잘 어울려요.</p>`;
+    box.querySelectorAll('input[data-k]').forEach(inp=>inp.onchange=async()=>{
+      const f=inp.files&&inp.files[0]; if(!f)return;
+      try{const d=await readChar(f);localStorage.setItem(CHAR_K[inp.dataset.k],d);if(inp.dataset.k==='card')charToWidget();applyChars();draw();toast('그림을 바꿨어요',false)}catch(e){toast('그림을 저장하지 못했어요',false)}
+    });
+    box.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{try{localStorage.removeItem(CHAR_K[b.dataset.r])}catch(e){}if(b.dataset.r==='card')charToWidget();applyChars();draw()});
+    const pin=box.querySelector('#charPin');
+    if(pin)pin.onclick=()=>{const d=localStorage.getItem(CHAR_K.top)||'';Capacitor.Plugins.WidgetBridge.pinShortcut({data:d.split(',')[1],label:'기말감사'}).then(()=>toast('홈 화면에 바로가기를 추가해 주세요',false)).catch(e=>toast(e&&e.message||'바로가기를 만들지 못했어요',false))};
+  };
+  draw(); applyChars(); if(native)charToWidget();
+}
+
 /* render */
 function render(){
   const ys=yearsSorted();
@@ -607,7 +736,7 @@ function render(){
   try{cur&&localStorage.setItem(UI_KEY,cur)}catch(e){}
   renderYears();
   $('views').hidden=!cur;
-  $('views').querySelectorAll('button').forEach(b=>{b.setAttribute('aria-pressed',b.dataset.v===view);b.onclick=()=>{view=b.dataset.v;if(view==='cal')calView=null;try{localStorage.setItem('audit-ui-view',view)}catch(e){};renderMain();$('views').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===view))}});
+  $('views').querySelectorAll('button').forEach(b=>{b.setAttribute('aria-pressed',b.dataset.v===view);b.onclick=()=>{if(b.dataset.v==='set'){document.querySelector('.more').scrollIntoView({behavior:'smooth',block:'start'});return}view=b.dataset.v;window.scrollTo(0,0);if(view==='cal')calView=null;try{localStorage.setItem('audit-ui-view',view)}catch(e){};renderMain();$('views').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===view))}});
   renderMain();
   $('delYearBtn').hidden=!cur; $('resetYearBtn').hidden=!cur;
   renderBackup();
@@ -615,15 +744,24 @@ function render(){
 function renderYears(){
   const nav=$('years'); nav.innerHTML='';
   const ys=yearsSorted(); const next=ys.length?Number(ys[ys.length-1])+1:now.getFullYear();
-  if(ys.length){
-    const l=document.createElement('label'); l.className='osel';
-    l.innerHTML=`<span>회계연도</span><select id="yearSel" aria-label="회계연도">${ys.slice().reverse().map(y=>`<option value="${y}" ${y===cur?'selected':''}>FY${y}</option>`).join('')}</select>`;
-    l.querySelector('select').onchange=e=>{cur=e.target.value;flt=null;calView=null;render()};
-    nav.appendChild(l);
+  if(!ys.length){
+    const a=document.createElement('button'); a.type='button'; a.className='yr-add';
+    a.textContent=`+ FY${next} 시작`; a.onclick=()=>openNewYear(next); nav.appendChild(a); return;
   }
-  const a=document.createElement('button'); a.type='button'; a.className='yr-add';
-  a.textContent=`+ FY${next} 시작`; a.onclick=()=>openNewYear(next);
-  nav.appendChild(a);
+  // 회계연도: 지난 연도가 위, 맨 아래에 새 연도 시작
+  const l=document.createElement('label'); l.className='osel';
+  l.innerHTML=`<span>회계연도</span><select id="yearSel" aria-label="회계연도">${ys.map(y=>`<option value="${y}" ${y===cur?'selected':''}>FY${y}</option>`).join('')}<option disabled>──────</option><option value="__new">+ FY${next} 시작</option></select>`;
+  l.querySelector('select').onchange=e=>{if(e.target.value==='__new'){e.target.value=cur;openNewYear(next);return}cur=e.target.value;flt=null;calView=null;render()};
+  nav.appendChild(l);
+  // 담당자 필터를 같은 줄에
+  const owners=[...new Set(list().flatMap(c=>[c.confirmOwner,c.reportOwner]).filter(Boolean))].sort((a,b)=>collator.compare(a,b));
+  if(ownerF&&!owners.includes(ownerF))ownerF='';
+  if(owners.length){
+    const o=document.createElement('label'); o.className='osel';
+    o.innerHTML=`<span>담당자</span><select id="ownSel" aria-label="담당자 필터"><option value="">전체</option>${owners.map(x=>`<option value="${esc(x)}" ${x===ownerF?'selected':''}>${esc(x)}</option>`).join('')}</select>`;
+    o.querySelector('select').onchange=e=>{ownerF=e.target.value;saveOwner();renderMain()};
+    nav.appendChild(o);
+  }
 }
 
 function renderMain(){
@@ -636,15 +774,14 @@ function renderMain(){
   const yearOwners=[...new Set(list().flatMap(c=>[c.confirmOwner,c.reportOwner]).filter(Boolean))].sort((a,b)=>collator.compare(a,b));
   if(ownerF&&!yearOwners.includes(ownerF))ownerF='';
   const ownMatch=c=>!ownerF||(ownerScope!=='report'&&c.confirmOwner===ownerF)||(ownerScope!=='confirm'&&c.reportOwner===ownerF);
-  if(yearOwners.length){
+  if(yearOwners.length&&ownerF){
     const orow=document.createElement('div'); orow.className='owner-row';
-    orow.innerHTML=`<label class="osel"><span>담당자</span><select id="ownSel" aria-label="담당자 필터"><option value="">전체</option>${yearOwners.map(o=>`<option value="${esc(o)}" ${o===ownerF?'selected':''}>${esc(o)}</option>`).join('')}</select></label>
-      <div class="seg small" id="ownScope" ${ownerF?'':'hidden'}><button type="button" data-v="confirm">조회서</button><button type="button" data-v="report">보고서</button><button type="button" data-v="both">둘 다</button></div>`;
+    orow.innerHTML=`<div class="seg small" id="ownScope"><button type="button" data-v="confirm">조회서</button><button type="button" data-v="report">보고서</button><button type="button" data-v="both">둘 다</button></div>`;
     orow.querySelectorAll('#ownScope button').forEach(b=>{b.setAttribute('aria-pressed',b.dataset.v===ownerScope);b.onclick=()=>{ownerScope=b.dataset.v;saveOwner();renderMain()}});
-    orow.querySelector('#ownSel').onchange=e=>{ownerF=e.target.value;saveOwner();renderMain()};
     m.appendChild(orow);
   }
   const L=list().filter(ownMatch);
+  if(view!=='cal')m.appendChild(helloCard(L));
   if(view==='cal'){renderCalendar(m,L.filter(c=>c.join!=='n'));return}
   if(view==='conf'){renderConf(m,ownMatch);return}
   const inn=L.filter(c=>c.join==='y'), und=L.filter(c=>c.join===''), out=L.filter(c=>c.join==='n');
@@ -1928,6 +2065,7 @@ $('exportBtn').onclick=async()=>{
 render();
 initStore();
 setupWidgetSetting();
+setupChars();
 loadSystemFont();
 setTimeout(autoTrack,4000);
 })();
