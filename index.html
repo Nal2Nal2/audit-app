@@ -365,6 +365,8 @@ header h1::before{display:none!important}
 .hello span{font-size:13px;color:var(--muted)}
 .hello img{width:82px;height:82px;object-fit:contain;margin:-14px -2px -12px 0}
 .charset{display:flex;flex-direction:column;gap:8px}
+.set-h{margin:4px 2px 0;font-size:20px}
+.more{margin-top:0}
 .crow{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--soft);border-radius:14px;padding:8px 10px}
 .crow img{width:56px;height:56px;object-fit:contain;border-radius:10px;background:var(--surface)}
 .crow b{display:block;font-size:14px}
@@ -736,7 +738,7 @@ function render(){
   try{cur&&localStorage.setItem(UI_KEY,cur)}catch(e){}
   renderYears();
   $('views').hidden=!cur;
-  $('views').querySelectorAll('button').forEach(b=>{b.setAttribute('aria-pressed',b.dataset.v===view);b.onclick=()=>{if(b.dataset.v==='set'){document.querySelector('.more').scrollIntoView({behavior:'smooth',block:'start'});return}view=b.dataset.v;window.scrollTo(0,0);if(view==='cal')calView=null;try{localStorage.setItem('audit-ui-view',view)}catch(e){};renderMain();$('views').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===view))}});
+  $('views').querySelectorAll('button').forEach(b=>{b.setAttribute('aria-pressed',b.dataset.v===view);b.onclick=()=>{view=b.dataset.v;window.scrollTo(0,0);if(view==='cal')calView=null;if(view!=='set'){try{localStorage.setItem('audit-ui-view',view)}catch(e){}}render()}});
   renderMain();
   $('delYearBtn').hidden=!cur; $('resetYearBtn').hidden=!cur;
   renderBackup();
@@ -756,7 +758,7 @@ function renderYears(){
   // 담당자 필터를 같은 줄에
   const owners=[...new Set(list().flatMap(c=>[c.confirmOwner,c.reportOwner]).filter(Boolean))].sort((a,b)=>collator.compare(a,b));
   if(ownerF&&!owners.includes(ownerF))ownerF='';
-  if(owners.length){
+  if(owners.length&&view!=='set'){
     const o=document.createElement('label'); o.className='osel';
     o.innerHTML=`<span>담당자</span><select id="ownSel" aria-label="담당자 필터"><option value="">전체</option>${owners.map(x=>`<option value="${esc(x)}" ${x===ownerF?'selected':''}>${esc(x)}</option>`).join('')}</select>`;
     o.querySelector('select').onchange=e=>{ownerF=e.target.value;saveOwner();renderMain()};
@@ -765,12 +767,15 @@ function renderYears(){
 }
 
 function renderMain(){
+  // 설정은 따로 탭: 설정 화면에서는 설정만, 다른 화면에서는 설정을 숨겨요(연도가 없을 땐 엑셀 불러오기를 위해 보여요)
+  const more=document.querySelector('.more'); if(more)more.hidden=!!cur&&view!=='set';
   setTimeout(pushWidget,0);
   const m=$('main'); m.innerHTML='';
   if(!cur){
     m.innerHTML=`<div class="empty"><h2>아직 회계연도가 없어요</h2><p>쓰던 감사 진행 엑셀을 불러오면 연도별로 바로 정리돼요. 처음부터 시작하려면 위에서 연도를 만들고 회사를 추가하세요.</p><label class="btn primary" for="fileIn">엑셀 불러오기</label></div>`;
     return;
   }
+  if(view==='set'){m.innerHTML='<h2 class="set-h">설정</h2>';return}
   const yearOwners=[...new Set(list().flatMap(c=>[c.confirmOwner,c.reportOwner]).filter(Boolean))].sort((a,b)=>collator.compare(a,b));
   if(ownerF&&!yearOwners.includes(ownerF))ownerF='';
   const ownMatch=c=>!ownerF||(ownerScope!=='report'&&c.confirmOwner===ownerF)||(ownerScope!=='confirm'&&c.reportOwner===ownerF);
@@ -972,7 +977,7 @@ function setupWidgetSetting(){
     CapApp.addListener('backButton',()=>{
       if(!$('scrim').hidden){closeSheet();return}
       if(rpClose){rpClose();return}
-      if(view==='cal'||view==='conf'){view='list';try{localStorage.setItem('audit-ui-view',view)}catch(e){};render();return}
+      if(view==='cal'||view==='conf'||view==='set'){view='list';try{localStorage.setItem('audit-ui-view',view)}catch(e){};render();return}
       if(flt){flt=null;renderMain();return}
       if(window.scrollY>200){window.scrollTo({top:0,behavior:'smooth'});return}
       CapApp.exitApp();
@@ -1455,7 +1460,7 @@ $('fileIn').addEventListener('change',async e=>{
         lastSnapshot=null; return}}
   }
   if(!got.length){lastSnapshot=null;toast(failed?'파일을 읽지 못했어요. .xlsx 파일인지 확인해 주세요':'구분(회사명) 열이 있는 표를 못 찾았어요',false);return}
-  cur=got[got.length-1].y;
+  cur=got[got.length-1].y; if(view==='set')view='list';
   commit(`불러왔어요 · ${got.map(x=>x.t).join(', ')}`);
 });
 
