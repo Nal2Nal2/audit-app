@@ -1490,6 +1490,7 @@ function parseReceipt(res){
     const zm=rest.match(/(?<![\d,\-])(\d{5})(?![\d,])/); let zip='', name='';
     if(zm){zip=zm[1];name=rest.slice(zm.index+5)}
     name=name.replace(/[^가-힣A-Za-z0-9()㈜*●\s]/g,' ').replace(/\s+/g,' ').trim().slice(0,20);
+    if(!(res&&res.lines)&&!/[가-힣]/.test(name))name='';   // 컴퓨터(영문 글자 읽기)는 한글 이름을 못 읽어서 엉뚱한 글자가 나와요 → 비워 둬요
     out.push({reg,fee,zip,name,item:''});
   });
   // 두 번 읽은 결과가 다르면 그 자리 숫자를 '확인 필요'로 표시해요
