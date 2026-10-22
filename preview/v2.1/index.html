@@ -369,6 +369,22 @@ header h1::before{width:15px;height:15px;border-radius:50%;background:#ffffff;bo
 .more{scroll-margin-top:22px}
 @media(min-width:750px){.bottom-nav{border-radius:18px 18px 0 0}}
 
+
+/* v2.1 character design */
+.rabbit-welcome{display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;min-height:174px;padding:18px 18px 14px 22px;margin:13px 0 16px;background:linear-gradient(125deg,#eaf5ff 0%,#f6fbff 60%,#e9f5ff 100%);border:1px solid #d8eafb;border-radius:24px;box-shadow:0 8px 22px rgba(51,108,170,.07)}
+.rabbit-welcome:before{content:"";position:absolute;width:190px;height:190px;right:-35px;top:-55px;border-radius:50%;background:#dceeff;opacity:.65}
+.rabbit-welcome-copy{position:relative;z-index:1;flex:1;min-width:0}
+.rabbit-eyebrow{font-size:10px;font-weight:800;letter-spacing:1.3px;color:#4e91d5}
+.rabbit-welcome h2{font-size:clamp(17px,4.4vw,22px);line-height:1.42;margin:10px 0 9px;color:#254a78;letter-spacing:-.65px}
+.rabbit-welcome p{font-size:11px;line-height:1.6;margin:0;color:#6c86a5;max-width:210px}
+.rabbit-sparkle{display:block;margin-top:9px;color:#f1bd63;font-size:15px;letter-spacing:4px}
+.rabbit-art{position:relative;z-index:1;flex:0 0 135px;align-self:flex-end;margin:-10px -7px -12px 0}
+.rabbit-illustration{width:100%;height:auto;display:block;filter:drop-shadow(0 5px 4px rgba(83,125,176,.12))}
+.rabbit-settings-heading{display:flex;align-items:center;gap:12px;padding:14px 16px;margin-bottom:12px;background:var(--soft);border-radius:17px}
+.rabbit-mini{display:grid;place-items:center;width:44px;height:44px;background:#e0efff;border-radius:50%;font-size:25px}
+.rabbit-settings-heading b,.rabbit-settings-heading small{display:block}.rabbit-settings-heading small{margin-top:4px;color:var(--muted);font-size:11px}
+@media(max-width:380px){.rabbit-welcome{padding-left:15px}.rabbit-art{flex-basis:105px}.rabbit-welcome h2{font-size:17px}.rabbit-welcome p{font-size:10px}}
+
 </style>
 </head>
 <body>
@@ -380,12 +396,14 @@ header h1::before{width:15px;height:15px;border-radius:50%;background:#ffffff;bo
     <span class="status" id="status">불러오는 중…</span>
   </header>
 
+  <section class="rabbit-welcome" aria-label="기말감사 도우미"><div class="rabbit-welcome-copy"><span class="rabbit-eyebrow">AUDIT COMPANION</span><h2>오늘도 차근차근,<br>감사 업무를 정리해요.</h2><p>진행 현황부터 일정까지 한눈에 확인하세요.</p><span class="rabbit-sparkle" aria-hidden="true">✦　✧　✦</span></div><div class="rabbit-art"><svg class="rabbit-illustration" viewBox="0 0 160 158" role="img" aria-label="파란 넥타이를 맨 흰 토끼 캐릭터"><defs><linearGradient id="rabbitShirt" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#edf5ff"/></linearGradient></defs><ellipse cx="81" cy="146" rx="54" ry="8" fill="#b7d4f2" opacity=".35"/><path d="M47 73C30 52 24 7 38 5c15-2 30 36 32 59M93 64c1-29 17-63 31-59 16 5 4 52-10 70" fill="#fff" stroke="#a8c4e9" stroke-width="3.5"/><path d="M49 57C38 38 34 17 40 15c7-2 18 25 21 42M103 56c3-21 13-42 18-40 6 3-2 28-12 44" fill="#f9c5d6"/><ellipse cx="80" cy="89" rx="51" ry="46" fill="url(#rabbitShirt)" stroke="#a8c4e9" stroke-width="3"/><ellipse cx="80" cy="133" rx="39" ry="21" fill="#fff" stroke="#a8c4e9" stroke-width="3"/><path d="M67 119l13 10 13-10-6 26H73z" fill="#4b91df"/><path d="M74 129l6-5 6 5-6 8z" fill="#2677cf"/><ellipse cx="61" cy="87" rx="4" ry="5" fill="#344b68"/><ellipse cx="99" cy="87" rx="4" ry="5" fill="#344b68"/><ellipse cx="49" cy="99" rx="9" ry="5" fill="#f9c5d6" opacity=".7"/><ellipse cx="111" cy="99" rx="9" ry="5" fill="#f9c5d6" opacity=".7"/><path d="M76 100q4-4 8 0l-4 4z" fill="#e79aaf"/><path d="M80 104v4m0 0q-6 6-11 0m11 0q6 6 11 0" fill="none" stroke="#647e9f" stroke-width="2" stroke-linecap="round"/><path d="M51 132l-9-5m67 5 9-5" stroke="#a8c4e9" stroke-width="5" stroke-linecap="round"/></svg></div></section>
   <nav class="years" id="years" aria-label="회계연도"></nav>
   <div class="views" id="views" role="group" aria-label="보기"><button type="button" data-v="list">회사별 현황</button><button type="button" data-v="conf">조회서 업무</button><button type="button" data-v="cal">일정</button></div>
 
   <div id="main"></div>
 
   <section class="more">
+    <div class="rabbit-settings-heading"><span class="rabbit-mini">🐰</span><span><b>토끼 감사 도우미</b><small>기말감사 v2.1 디자인 미리보기</small></span></div>
     <div class="wset" id="widgetSet" hidden>
       <h3>홈 화면 위젯</h3>
       <label class="wrow" for="wAlpha"><span>배경 투명도</span><input type="range" id="wAlpha" min="0" max="100" step="5"><b id="wAlphaTxt" class="mono"></b></label>
