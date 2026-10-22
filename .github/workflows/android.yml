@@ -52,18 +52,18 @@ jobs:
           ./gradlew assembleRelease --no-daemon --stacktrace
 
       - name: 파일 이름 정리
-        run: cp native/android/app/build/outputs/apk/release/app-release.apk gimal-audit-v2.0.apk
+        run: cp native/android/app/build/outputs/apk/release/app-release.apk gimal-audit-v2.1.apk
 
       - uses: actions/upload-artifact@v4
         with:
           name: gimal-audit-apk
-          path: gimal-audit-v2.0.apk
+          path: gimal-audit-v2.1.apk
 
       - name: 다운로드 페이지(Releases)에 올리기
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2.0
-          name: 기말감사 v2.0
-          body: 폰에서 아래 gimal-audit-v2.0.apk를 눌러 받아 설치하세요.
-          files: gimal-audit-v2.0.apk
+          tag_name: v2.1
+          name: 기말감사 v2.1
+          body: 폰에서 아래 gimal-audit-v2.1.apk를 눌러 받아 설치하세요.
+          files: gimal-audit-v2.1.apk
           make_latest: true
