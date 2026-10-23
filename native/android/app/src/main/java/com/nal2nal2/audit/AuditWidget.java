@@ -77,6 +77,8 @@ public class AuditWidget extends AppWidgetProvider {
             if (bm != null) { rv.setImageViewBitmap(R.id.char_img, bm); rv.setViewVisibility(R.id.char_img, View.VISIBLE); }
             else rv.setViewVisibility(R.id.char_img, View.GONE);
         } catch (Exception e) { rv.setViewVisibility(R.id.char_img, View.GONE); }
+        // 일정 칸 글자색(투명 모드에서는 배경화면에 맞춰 바꿔요)
+        int dateInk = 0, todayInk = 0;
         if (alpha <= 50) {
             int mode = 0;
             try { if (raw != null) mode = new JSONObject(raw).optInt("textMode", 0); } catch (Exception ignored) { }
@@ -87,6 +89,13 @@ public class AuditWidget extends AppWidgetProvider {
             rv.setTextColor(R.id.sub, muted);
             for (int[] c : CELL_IDS) { rv.setTextColor(c[0], muted); rv.setTextColor(c[1], ink); }
             for (int[] u : UP_IDS) { rv.setTextColor(u[2], ink); rv.setTextColor(u[3], muted); }
+            // 연한 초록 칸 위에 흰 글자는 안 보여서, 칸 배경을 반투명 어둡게/밝게 바꿔요
+            rv.setInt(R.id.up_box, "setBackgroundResource", white ? R.drawable.widget_up_dark : R.drawable.widget_up_light);
+            rv.setTextColor(R.id.ok_text, ink);
+            dateInk = ink;
+            todayInk = white ? 0xFFFFB4A8 : 0xFFC0392B;
+        } else {
+            rv.setInt(R.id.up_box, "setBackgroundResource", R.drawable.widget_ok_bg);
         }
         if (raw == null) {
             rv.setTextViewText(R.id.title, "기말감사");
@@ -132,11 +141,11 @@ public class AuditWidget extends AppWidgetProvider {
                     rv.setViewVisibility(ids[0], View.VISIBLE);
                     if (ds <= 0) {
                         rv.setTextViewText(ids[1], "오늘");
-                        rv.setTextColor(ids[1], ctx.getResources().getColor(R.color.w_danger));
+                        rv.setTextColor(ids[1], todayInk != 0 ? todayInk : ctx.getResources().getColor(R.color.w_danger));
                         rv.setTextViewText(ids[3], de > 0 ? "~" + md(e.optString("e", "")) : "");
                     } else {
                         rv.setTextViewText(ids[1], md(e.optString("s", "")));
-                        rv.setTextColor(ids[1], ctx.getResources().getColor(R.color.w_accent));
+                        rv.setTextColor(ids[1], dateInk != 0 ? dateInk : ctx.getResources().getColor(R.color.w_accent));
                         rv.setTextViewText(ids[3], "D-" + ds);
                     }
                     rv.setTextViewText(ids[2], e.optString("t", ""));

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 투명 위젯 + 흰 글자일 때 일정 칸: 반투명 어두운 배경 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#59000000" />
+    <corners android:radius="12dp" />
+</shape>
