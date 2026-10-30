@@ -397,6 +397,9 @@ html.tt .views button{flex:none;flex-direction:row;padding:5px 16px;font-size:12
 html.tt .views button:last-child{border-right:0}
 html.tt .views button svg{display:none}
 html.tt .views button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:700}
+html.tt .views button[data-v="set"]{display:none}
+html.tt-set .views,html.tt-set .years,html.tt-set .set-h{display:none!important}
+html.tt-set header{position:static;border-bottom:0;background:transparent;padding-top:4px}
 html.tt .years{flex:none;gap:8px}
 html.tt .years .osel{flex:none;box-shadow:none;border:1px solid #CDD5E1}
 html.tt .card,html.tt .fold,html.tt .empty,html.tt .strip,html.tt .calbox,html.tt .agenda{box-shadow:none!important;border:1px solid var(--line)!important}
@@ -739,8 +742,10 @@ window.addEventListener('message',e=>{
   const d=e.data||{};
   if(d.type==='tt-hello')ttSync(true);
   else if(d.type==='tt-wp'){WP=d.data||{};try{localStorage.setItem('audit-tt-wp',JSON.stringify(WP))}catch(_){}renderMain()}
-  else if(d.type==='tt-view'&&['list','cal','conf','set'].includes(d.view)){view=d.view;if(view==='cal')calView=null;render()}
+  else if(d.type==='tt-view'&&['list','cal','conf','set'].includes(d.view)){view=d.view;if(view==='cal')calView=null;ttSetMode();render();window.scrollTo(0,0)}
 });
+/* 설정은 틱앤타이 설정 화면 안에서만: 탭 줄을 숨기고 제목을 바꿔요 */
+function ttSetMode(){const on=view==='set';document.documentElement.classList.toggle('tt-set',on);const h=document.querySelector('header h1');if(h)h.textContent=on?'기말감사 앱':'감사 현황'}
 function ttOpen(c,ph){try{parent.postMessage({type:'tt-open',id:c.id,name:c.name,phase:ph||''},'*')}catch(e){}}
 function pushWidget(){
   const W=window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform()&&Capacitor.Plugins&&Capacitor.Plugins.WidgetBridge;
@@ -2246,6 +2251,7 @@ $('exportBtn').onclick=async()=>{
   }catch(e){if(e&&e.code!=='declined')toast('파일을 저장하지 못했어요',false)}
 };
 
+if(EMBED&&view==='set')view='list';
 if(EMBED){const h=document.querySelector('header');h.querySelector('h1').textContent='감사 현황';h.insertBefore($('views'),h.querySelector('.status'));h.insertBefore($('years'),h.querySelector('.status'))}
 render();
 initStore();
