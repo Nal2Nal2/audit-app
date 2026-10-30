@@ -372,6 +372,78 @@ header h1::before{display:none!important}
 .crow b{display:block;font-size:14px}
 .crow .fine{display:block}
 .crow .acts{display:flex;gap:6px}
+
+/* 계약일·조서 마감 일정 */
+.lg.contract,.ev.contract{background:#efe6f6;color:#5e2f80;box-shadow:inset 0 0 0 1px #8e5bb5}
+.lg.wp{background:transparent;box-shadow:inset 0 0 0 1px var(--prog)}
+.ev.wp{background:var(--surface);color:var(--prog);box-shadow:inset 0 0 0 1px var(--prog);border:1px dashed var(--prog)}
+.ev.wp.done{color:var(--ok);border-color:var(--ok);box-shadow:none}
+.ag-it .lg{flex:none}
+/* ---------- 틱앤타이 안 (넓은 화면 + 틱앤타이 디자인) ---------- */
+html.tt{--bg:#F1F4F9;--surface:#fff;--ink:#1A2433;--muted:#5A6678;--line:#E1E6EE;--soft:#F6F8FB;--accent:#1F3F6E;--accent-ink:#fff;--accent-soft:#EAF0F9;
+  --ok:#22703F;--ok-soft:#E3F3E8;--warn:#7A5200;--warn-soft:#FDF1D8;--prog:#2F6FDB;--prog-soft:#E6EDF8;--danger:#A63A1F;--pink:#A63A1F;--pink-soft:#FBE4DC;
+  --mint:#3FA36B;--rose:#C2410C;--yellow:#D98E04;--shadow:transparent;--hello:#fff;--f-body:"Malgun Gothic","맑은 고딕",system-ui,sans-serif;color-scheme:light}
+html.tt,html.tt body{background:var(--bg);min-height:100%}
+html.tt body{font-size:13px}
+html.tt *{border-radius:2px!important}
+html.tt .spin{border-radius:50%!important}
+html.tt .wrap{max-width:none;padding:0 20px 28px;gap:12px}
+html.tt header{position:sticky;top:0;z-index:8;background:#fff;margin:0 -20px;padding:10px 20px;border-bottom:1px solid var(--line);justify-content:flex-start;gap:16px;flex-wrap:wrap}
+html.tt header h1{font-size:17px;font-weight:700;letter-spacing:0}
+html.tt .char-top{display:none}
+html.tt .status{order:9;margin-left:auto}
+html.tt .views{position:static;display:inline-flex;width:auto;padding:0;border:1px solid #CDD5E1;box-shadow:none;background:#fff;gap:0}
+html.tt .views button{flex:none;flex-direction:row;padding:5px 16px;font-size:12px;color:var(--ink);border-right:1px solid #CDD5E1;font-weight:500}
+html.tt .views button:last-child{border-right:0}
+html.tt .views button svg{display:none}
+html.tt .views button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:700}
+html.tt .years{flex:none;gap:8px}
+html.tt .years .osel{flex:none;box-shadow:none;border:1px solid #CDD5E1}
+html.tt .card,html.tt .fold,html.tt .empty,html.tt .strip,html.tt .calbox,html.tt .agenda{box-shadow:none!important;border:1px solid var(--line)!important}
+html.tt .toast{bottom:16px}
+html.tt .hello{border:1px solid var(--line);padding:12px 16px}
+html.tt .hello img{display:none}
+html.tt .hello .hk{color:var(--mute,#5A6678)}
+html.tt .strip .cell .bar i{background:var(--accent)!important}
+html.tt .pill{font-size:12px;padding:2px 9px}
+html.tt .pill.ok,html.tt .signbtn[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+html.tt .btn.primary{background:var(--accent);border-color:var(--accent)}
+html.tt .addbtn{background:#fff;border:1px solid var(--accent);color:var(--accent);font-size:12px;padding:4px 10px}
+html.tt .more{max-width:640px}
+.tt-top{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,2fr);gap:12px}
+.tt-card{background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
+.tt-ch{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tt-ch b{font-size:13px}
+.tt-lg{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.tt-lg i{display:inline-block;width:10px;height:8px;margin-left:6px;background:var(--prog)}
+.tt-lg i.d{background:var(--mint)} .tt-lg i.l{background:#fff;outline:1.5px solid var(--rose)}
+.tt-tw{overflow-x:auto}
+.tt-t{border-collapse:collapse;width:100%;font-size:12.5px}
+.tt-t th{font-size:11px;color:var(--muted);font-weight:700;text-align:left;padding:8px 10px;border-bottom:1px solid #CDD5E1;background:#F8FAFC;white-space:nowrap}
+.tt-t td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:middle;white-space:nowrap}
+.tt-t tr:hover td{background:#F8FAFD}
+.tt-t tr.sub td:first-child{padding-left:26px}
+.tt-t tr.sub td:first-child::before{content:"└ ";color:#A9B4C4}
+.tt-t tr.signed td{color:var(--muted)}
+.tt-nm{border:0;background:none;padding:0;font-weight:700;color:var(--ink);text-align:left}
+.tt-nm:hover{color:var(--accent);text-decoration:underline}
+.tt-t .tag{margin-left:6px}
+.tt-t .signbtn{font-size:12px;padding:2px 8px}
+.wp-bars{display:inline-flex;gap:3px;vertical-align:middle}
+.wp-bars i{display:block;width:30px;height:8px;background:#EEF1F5;position:relative;overflow:hidden}
+.wp-bars i b{position:absolute;left:0;top:0;bottom:0;background:var(--prog)}
+.wp-bars i.done b{background:var(--mint)}
+.wp-bars i.late{outline:1.5px solid var(--rose)}
+.wp-t{margin-left:8px;font-size:12px}
+.wp-t b.late{color:var(--rose)} .wp-t b.soon{color:var(--warn)}
+.wp-none{color:#A0AABA;font-size:12px}
+.wp-ok{color:var(--ok)}
+.wp-go{margin-left:8px;font-size:12px;color:var(--accent)}
+#main.tt-cal{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:12px;align-items:start}
+html.tt .cday{min-height:92px}
+html.tt .ev{font-size:11px}
+html.tt .cal-head h2{font-size:17px}
+@media (max-width:1100px){.tt-top{grid-template-columns:1fr}#main.tt-cal{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -414,6 +486,9 @@ header h1::before{display:none!important}
 <script>
 (function(){
 const $=id=>document.getElementById(id);
+/* 틱앤타이(PC 프로그램) 안에 열렸을 때: 넓은 화면 + 틱앤타이 디자인, 조서 진행 주고받기 */
+const EMBED=(()=>{try{return new URLSearchParams(location.search).get('embed')==='tt'&&window.parent!==window}catch(e){return false}})();
+if(EMBED){document.documentElement.classList.add('tt');document.documentElement.setAttribute('data-theme','light')}
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const pad=n=>String(n).padStart(2,'0');
 const now=new Date();
@@ -445,7 +520,7 @@ try{cur=localStorage.getItem(UI_KEY)}catch(e){}
 
 const yearsSorted=()=>Object.keys(state.years).sort();
 const list=()=>state.years[cur]||[];
-function blank(name){return {id:uid(),name:name||'',join:'',confirmOwner:'',confirm:'ready',reportOwner:'',sep:'todo',con:'todo',role:'none',parent:'',agm:'',lobbyOffset:state.settings.lobbyDays,signoff:false,note:'',field:[],fieldMid:[]}}
+function blank(name){return {id:uid(),name:name||'',join:'',confirmOwner:'',confirm:'ready',reportOwner:'',sep:'todo',con:'todo',role:'none',parent:'',agm:'',lobbyOffset:state.settings.lobbyDays,signoff:false,note:'',field:[],fieldMid:[],contract:''}}
 function norm(c){const b=blank();return Object.assign(b,c||{})}
 
 /* dates */
@@ -602,7 +677,7 @@ function renderSync(){
 }
 async function initStore(){
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
-  if(!window.claude||!window.claude.use){useLocal('이 폰에 저장됨');return}
+  if(!window.claude||!window.claude.use){useLocal(EMBED?'이 컴퓨터에 저장됨':'이 폰에 저장됨');return}
   let db=null,user=null;
   try{[db,user]=await Promise.all([claude.use('db'),claude.use('user')])}catch(e){}
   const id=user?await user.id().catch(()=>null):null;
@@ -628,21 +703,51 @@ function snapshot(){lastSnapshot=JSON.stringify(state)}
 function commit(msg){store&&store.save(state);render();if(msg)toast(msg)}
 /* 홈 화면 위젯(안드로이드 앱에서만): 지금 연도·담당자 필터 기준 요약을 넘겨줘요 */
 let widgetTimer=null, widgetLast='';
+function widgetData(){
+  const y=cur; const arr=y?(state.years[y]||[]):[];
+  const own=c=>!ownerF||(ownerScope!=='report'&&c.confirmOwner===ownerF)||(ownerScope!=='confirm'&&c.reportOwner===ownerF);
+  const inn=arr.filter(c=>c.join==='y'&&own(c)), parents=inn.filter(c=>c.role==='parent');
+  const n=f=>inn.filter(f).length;
+  return {fy:y||'',scope:ownerF?`${ownerF} ${ownerScope==='confirm'?'조회서':ownerScope==='report'?'보고서':''}`.trim():'전체',
+    alpha:widgetAlpha(), textMode:widgetText(),
+    cells:[['조회서',n(c=>c.confirm==='done'||c.confirm==='na'),inn.length],['별도',n(c=>c.sep==='done'),inn.length],['연결',parents.filter(c=>c.con==='done').length,parents.length],['Lobby',n(c=>c.signoff),inn.length]],
+    pending:inn.filter(c=>!c.signoff&&c.agm).map(c=>({n:c.name,agm:c.agm})),
+    up:upcoming(arr.filter(c=>c.join!=='n'&&own(c)),8).map(x=>({s:x.s,e:x.e,t:x.t})),
+    updated:new Date().toISOString()};
+}
+/* ---------- 틱앤타이 연결 ----------
+   앱 → 틱앤타이: 회사·일정·진행 요약 (조서 마감 계산과 시작 화면용)
+   틱앤타이 → 앱: 회사별 조서 진행 (회사 id별, 이 기기에만 저장) */
+let WP={}; try{WP=JSON.parse(localStorage.getItem('audit-tt-wp')||'{}')||{}}catch(e){}
+let ttLast='', ttTimer=null;
+function ttState(){
+  const C=(confs.years&&confs.years[cur])||{items:[]}, its=C.items||[];
+  return {type:'tt-state',fy:cur||'',years:yearsSorted(),user:SY.user?SY.user.email||'':'',loggedIn:!!SY.user,
+    widget:widgetData(),conf:{total:its.length,rep:its.filter(it=>it.rep).length,mailed:its.filter(it=>!it.online).length,dlv:its.filter(it=>it.dlv).length},
+    companies:list().map(c=>({id:c.id,name:c.name,join:c.join,role:c.role,parent:c.parent,confirmOwner:c.confirmOwner,reportOwner:c.reportOwner,
+      confirm:c.confirm,sep:c.sep,con:c.con,signoff:!!c.signoff,agm:c.agm,lobby:lobbyOf(c),contract:c.contract||'',
+      field:fieldRanges(c.field).map(r=>[r[0],r[1]]),fieldMid:fieldRanges(c.fieldMid).map(r=>[r[0],r[1]])}))};
+}
+function ttSync(force){
+  if(!EMBED)return; clearTimeout(ttTimer);
+  ttTimer=setTimeout(()=>{const st=ttState(),j=JSON.stringify(Object.assign({},st,{widget:Object.assign({},st.widget,{updated:''})}));
+    if(!force&&j===ttLast)return; ttLast=j; try{parent.postMessage(st,'*')}catch(e){}},300);
+}
+const ttOk=o=>/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(o||'');
+window.addEventListener('message',e=>{
+  if(!EMBED||e.source!==window.parent||!ttOk(e.origin))return;
+  const d=e.data||{};
+  if(d.type==='tt-hello')ttSync(true);
+  else if(d.type==='tt-wp'){WP=d.data||{};try{localStorage.setItem('audit-tt-wp',JSON.stringify(WP))}catch(_){}renderMain()}
+  else if(d.type==='tt-view'&&['list','cal','conf','set'].includes(d.view)){view=d.view;if(view==='cal')calView=null;render()}
+});
+function ttOpen(c,ph){try{parent.postMessage({type:'tt-open',id:c.id,name:c.name,phase:ph||''},'*')}catch(e){}}
 function pushWidget(){
   const W=window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform()&&Capacitor.Plugins&&Capacitor.Plugins.WidgetBridge;
   if(!W)return;
   clearTimeout(widgetTimer);
   widgetTimer=setTimeout(()=>{
-    const y=cur; const arr=y?(state.years[y]||[]):[];
-    const own=c=>!ownerF||(ownerScope!=='report'&&c.confirmOwner===ownerF)||(ownerScope!=='confirm'&&c.reportOwner===ownerF);
-    const inn=arr.filter(c=>c.join==='y'&&own(c)), parents=inn.filter(c=>c.role==='parent');
-    const n=f=>inn.filter(f).length;
-    const data={fy:y||'',scope:ownerF?`${ownerF} ${ownerScope==='confirm'?'조회서':ownerScope==='report'?'보고서':''}`.trim():'전체',
-      alpha:widgetAlpha(), textMode:widgetText(),
-      cells:[['조회서',n(c=>c.confirm==='done'||c.confirm==='na'),inn.length],['별도',n(c=>c.sep==='done'),inn.length],['연결',parents.filter(c=>c.con==='done').length,parents.length],['Lobby',n(c=>c.signoff),inn.length]],
-      pending:inn.filter(c=>!c.signoff&&c.agm).map(c=>({n:c.name,agm:c.agm})),
-      up:upcoming(arr.filter(c=>c.join!=='n'&&own(c)),8).map(x=>({s:x.s,e:x.e,t:x.t})),
-      updated:new Date().toISOString()};
+    const data=widgetData();
     const j=JSON.stringify(Object.assign({},data,{updated:''}));
     if(j===widgetLast)return; widgetLast=j;
     W.update({data:JSON.stringify(data)}).catch(()=>{});
@@ -769,8 +874,8 @@ function renderYears(){
 function renderMain(){
   // 설정은 따로 탭: 설정 화면에서는 설정만, 다른 화면에서는 설정을 숨겨요(연도가 없을 땐 엑셀 불러오기를 위해 보여요)
   const more=document.querySelector('.more'); if(more)more.hidden=!!cur&&view!=='set';
-  setTimeout(pushWidget,0);
-  const m=$('main'); m.innerHTML='';
+  setTimeout(pushWidget,0); ttSync();
+  const m=$('main'); m.innerHTML=''; m.className=EMBED?'tt-'+view:'';
   if(!cur){
     m.innerHTML=`<div class="empty"><h2>아직 회계연도가 없어요</h2><p>쓰던 감사 진행 엑셀을 불러오면 연도별로 바로 정리돼요. 처음부터 시작하려면 위에서 연도를 만들고 회사를 추가하세요.</p><label class="btn primary" for="fileIn">엑셀 불러오기</label></div>`;
     return;
@@ -786,6 +891,7 @@ function renderMain(){
     m.appendChild(orow);
   }
   const L=list().filter(ownMatch);
+  if(EMBED&&view==='list'){renderWide(m,L);return}
   if(view!=='cal')m.appendChild(helloCard(L));
   if(view==='cal'){renderCalendar(m,L.filter(c=>c.join!=='n'));return}
   if(view==='conf'){renderConf(m,ownMatch);return}
@@ -872,6 +978,69 @@ function renderMain(){
   }
 }
 
+/* ---------- 넓은 화면 (틱앤타이 안): 위 요약 + 회사 표 ---------- */
+function wpCell(c){
+  const w=WP[c.id];
+  if(!w)return '<span class="wp-none">조서 연결 안 됨</span>';
+  const bars=(w.phases||[]).map(p=>{const pct=p.total?Math.round(p.done/p.total*100):0, done=p.total&&p.done>=p.total;
+    const late=!done&&p.due&&p.due<todayKey;
+    return `<i class="${done?'done':''}${late?' late':''}" title="${esc(p.label)} ${p.done}/${p.total}${p.due?' · 마감 '+md(p.due):''}"><b style="width:${pct}%"></b></i>`}).join('');
+  const n=w.next; let t='';
+  if(n){const d=n.due?dday(n.due):null;
+    t=`${esc(n.label)} ${n.done}/${n.total}`+(n.due?` · <b class="${d.diff<0?'late':d.diff<=7?'soon':''}">${d.diff<0?(-d.diff)+'일 지남':d.txt}</b>`:n.noDue?` · <span class="wp-none">${esc(n.noDue)}</span>`:'');}
+  else t='<span class="wp-ok">모두 작성 완료</span>';
+  return `<span class="wp-bars">${bars}</span><span class="wp-t">${t}</span><button type="button" class="linkbtn wp-go" data-wp="${c.id}">조서 열기</button>`;
+}
+function renderWide(m,L){
+  const inn=L.filter(c=>c.join==='y'), und=L.filter(c=>c.join===''), out=L.filter(c=>c.join==='n');
+  const top=document.createElement('div'); top.className='tt-top';
+  top.appendChild(helloCard(L));
+  const cnt=(arr,f)=>arr.filter(f).length, parents=inn.filter(c=>c.role==='parent');
+  const strip=document.createElement('div'); strip.className='strip';
+  [['confirm',cnt(inn,c=>!FILTERS.confirm.test(c)),inn.length],['sep',cnt(inn,c=>!FILTERS.sep.test(c)),inn.length],['con',cnt(parents,c=>c.con==='done'),parents.length],['sign',cnt(inn,c=>c.signoff),inn.length]].forEach(([key,a,b])=>{
+    const el=document.createElement('button'); el.type='button'; el.className='cell'; el.setAttribute('aria-pressed',flt===key);
+    el.innerHTML=`<div class="k">${FILTERS[key].k}</div><div class="v">${a}<small>/${b}</small></div><div class="bar"><i style="width:${b?a/b*100:0}%"></i></div>`;
+    el.onclick=()=>{flt=flt===key?null:key;renderMain()}; strip.appendChild(el);
+  });
+  top.appendChild(strip); m.appendChild(top);
+  const shown=flt?inn.filter(FILTERS[flt].test):null;
+  const rows=flt?ordered(shown):[...ordered(inn),...ordered(und)];
+  const box=document.createElement('section'); box.className='tt-card';
+  box.innerHTML=`<div class="tt-ch"><b>${flt?esc(FILTERS[flt].miss)+' '+shown.length+'곳':'회사 '+(inn.length+und.length)+'곳'}</b>${flt?'<button type="button" class="linkbtn" id="ttAll">전체 보기</button>':''}<span class="fine">이름을 누르면 정보 편집 · 상태 칸을 누르면 바로 바꿔요</span><span style="flex:1"></span><span class="tt-lg"><i class="p"></i>진행 <i class="d"></i>완료 <i class="l"></i>마감 지남</span><button type="button" class="addbtn" id="ttAdd">+ 회사 추가</button></div>
+    <div class="tt-tw"><table class="tt-t"><thead><tr><th>회사</th><th>담당</th><th>계약</th><th>중간 필드</th><th>기말 필드</th><th>주총 · Lobby</th><th>조회서</th><th>별도</th><th>연결</th><th>Sign-off</th><th>조서 진행 <span class="fine">계약 · 중간전 · 중간 · 기말</span></th></tr></thead><tbody></tbody></table></div>`;
+  const tb=box.querySelector('tbody');
+  const rg=arr=>{const r=fieldRanges(arr);return r.length?r.map(rangeTxt).join(', '):'<span class="wp-none">—</span>'};
+  rows.forEach(c=>{
+    const tr=document.createElement('tr'); const p=c.role==='sub'?byId(c.parent):null;
+    if(p)tr.className='sub'; if(c.signoff)tr.classList.add('signed');
+    const own=[c.confirmOwner,c.reportOwner].filter(Boolean); const ownT=own.length===2&&own[0]===own[1]?own[0]:own.join(' / ');
+    const lob=lobbyOf(c);
+    const pill=(arr,key)=>{const [,nm,tone]=lookup(arr,c[key]);return `<button type="button" class="pill ${tone}" data-st="${key}">${nm}</button>`};
+    tr.innerHTML=`<td><button type="button" class="tt-nm" data-ed="1">${esc(c.name)}</button>${c.role==='parent'?'<span class="tag">연결</span>':''}${c.join===''?'<span class="tag q">미정</span>':''}</td>
+      <td class="fine">${esc(ownT)}</td><td class="mono">${c.contract?md(c.contract):'<span class="wp-none">—</span>'}</td>
+      <td class="mono">${rg(c.fieldMid)}</td><td class="mono">${rg(c.field)}</td>
+      <td class="mono">${c.agm?md(c.agm)+(lob?` · <span class="fine">${md(lob)}</span>`:''):'<span class="wp-none">—</span>'}</td>
+      <td>${pill(CONFIRM,'confirm')}</td><td>${pill(REPORT,'sep')}</td><td>${c.role==='parent'?pill(REPORT,'con'):'<span class="wp-none">—</span>'}</td>
+      <td><button type="button" class="signbtn" aria-pressed="${!!c.signoff}" data-sg="1">${c.signoff?'✓':'Sign-off'}</button></td>
+      <td class="wp">${c.join==='n'?'':wpCell(c)}</td>`;
+    tr.querySelector('[data-ed]').onclick=()=>openEdit(c.id);
+    tr.querySelectorAll('[data-st]').forEach(b=>{const k=b.dataset.st;b.onclick=()=>openStatus(c,k==='confirm'?'조회서':k==='sep'?'별도':'연결',k==='confirm'?CONFIRM:REPORT,k)});
+    tr.querySelector('[data-sg]').onclick=()=>setField(c,'signoff',!c.signoff,c.signoff?`${c.name} Sign-off 취소`:`${c.name} Sign-off 완료`);
+    const go=tr.querySelector('[data-wp]'); if(go)go.onclick=()=>ttOpen(c);
+    tb.appendChild(tr);
+  });
+  if(!rows.length)tb.innerHTML=`<tr><td colspan="11" class="fine" style="text-align:center;padding:20px">${flt?'다 끝났어요':'참여하는 회사가 없어요'}</td></tr>`;
+  box.querySelector('#ttAdd').onclick=()=>openEdit(null);
+  const all=box.querySelector('#ttAll'); if(all)all.onclick=()=>{flt=null;renderMain()};
+  m.appendChild(box);
+  if(!flt&&out.length){
+    const det=document.createElement('details'); det.className='fold';
+    det.innerHTML=`<summary><span>참여 안 함 <span class="s">${out.length}곳</span></span></summary><div class="fold-list"></div>`;
+    const fl=det.querySelector('.fold-list');
+    ordered(out).forEach(c=>{const r=document.createElement('button');r.type='button';r.className='frow';r.innerHTML=`<b>${esc(c.name)}</b><span class="r">${esc(c.confirmOwner||c.reportOwner||'')}</span>`;r.onclick=()=>openEdit(c.id);fl.appendChild(r)});
+    m.appendChild(det);
+  }
+}
 function card(c,prev){
   const el=document.createElement('article'); el.dataset.id=c.id;
   const p=c.role==='sub'?byId(c.parent):null;
@@ -1052,10 +1221,18 @@ function calEvents(comps){
   comps.forEach(c=>{
     FTYPES.forEach(t=>(c[FT[t].key]||[]).forEach(k=>push(k,{t,c})));
     if(c.agm){push(c.agm,{t:'agm',c});const l=lobbyOf(c);if(l)push(l,{t:'lobby',c})}
+    if(c.contract)push(c.contract,{t:'contract',c});
+    if(EMBED&&WP[c.id])(WP[c.id].phases||[]).forEach(p=>{if(p.due&&p.total)push(p.due,{t:'wp',c,p})});
   });
-  const rank={lobby:0,agm:1,mid:2,field:3};
+  const rank={contract:0,wp:1,lobby:2,agm:3,mid:4,field:5};
   Object.values(ev).forEach(a=>a.sort((x,y)=>rank[x.t]-rank[y.t]||collator.compare(x.c.name,y.c.name)));
   return ev;
+}
+function evDesc(e){
+  if(e.t==='agm')return '주주총회';
+  if(e.t==='contract')return '감사 계약일';
+  if(e.t==='wp')return `${e.p.label} 조서 마감 · 완료 ${e.p.done}/${e.p.total}`;
+  return 'Audit Lobby · '+(e.c.signoff?'Sign-off 완료':'Sign-off 전');
 }
 function renderCalendar(m,comps){
   if(!calView){
@@ -1066,7 +1243,7 @@ function renderCalendar(m,comps){
   const {y,m:mo}=calView;
   const box=document.createElement('section'); box.className='calbox';
   box.innerHTML=`<div class="cal-head"><h2 class="mono">${y}. ${pad(mo)}</h2><div class="nav"><button type="button" class="cprev" aria-label="이전 달">‹</button><button type="button" class="ctoday">오늘</button><button type="button" class="cnext" aria-label="다음 달">›</button></div></div>
-    <div class="legend"><span><i class="lg mid"></i>중간 필드</span><span><i class="lg field"></i>기말 필드</span><span><i class="lg lobby"></i>Audit Lobby</span><span><i class="lg agm"></i>주총</span></div>
+    <div class="legend"><span><i class="lg mid"></i>중간 필드</span><span><i class="lg field"></i>기말 필드</span><span><i class="lg lobby"></i>Audit Lobby</span><span><i class="lg agm"></i>주총</span>${EMBED?'<span><i class="lg contract"></i>계약</span><span><i class="lg wp"></i>조서 마감</span>':''}</div>
     <div class="cgrid"></div><p class="fine">날짜를 누르면 그날 일정을 보고 필드를 추가할 수 있어요. 여러 날은 시작일을 꾹 누른 채 끝나는 날까지 끌어 주세요.</p>`;
   box.querySelector('.cprev').onclick=()=>{calView.m--;if(calView.m<1){calView.m=12;calView.y--}renderMain()};
   box.querySelector('.cnext').onclick=()=>{calView.m++;if(calView.m>12){calView.m=1;calView.y++}renderMain()};
@@ -1079,7 +1256,7 @@ function renderCalendar(m,comps){
     const k=`${y}-${pad(mo)}-${pad(d)}`, w=(first+d-1)%7, list=ev[k]||[], h=HOLIDAYS[k];
     const b=document.createElement('button'); b.type='button'; b.className='cday'+(w===0||h?' sun':w===6?' sat':'')+(k===todayKey?' today':''); b.dataset.key=k;
     const show=list.slice(0,3);
-    b.innerHTML=`<span class="dn">${d}</span>${h?`<span class="hn">${esc(h.length>4?h.slice(0,4):h)}</span>`:''}${show.map(e=>`<span class="ev ${e.t}${e.t==='lobby'&&e.c.signoff?' done':''}">${esc(e.c.name)}</span>`).join('')}${list.length>3?`<span class="more">+${list.length-3}</span>`:''}`;
+    b.innerHTML=`<span class="dn">${d}</span>${h?`<span class="hn">${esc(h.length>4?h.slice(0,4):h)}</span>`:''}${show.map(e=>`<span class="ev ${e.t}${e.t==='lobby'&&e.c.signoff?' done':''}${e.t==='wp'&&e.p.done>=e.p.total?' done':''}">${esc(e.c.name)}${e.t==='wp'?' '+esc(e.p.label)+' '+e.p.done+'/'+e.p.total:e.t==='contract'?' 계약':''}</span>`).join('')}${list.length>3?`<span class="more">+${list.length-3}</span>`:''}`;
     b.setAttribute('aria-label',`${mo}월 ${d}일${h?' '+h:''}${list.length?' 일정 '+list.length+'개':''}`);
     b.onclick=()=>{if(calSuppress){calSuppress=false;return}openDay(k,comps)};
     g.appendChild(b);
@@ -1104,7 +1281,7 @@ function renderCalendar(m,comps){
     agEv(k).forEach(e=>{
       const s=document.createElement('button'); s.type='button'; s.className='ag-it '+e.t;
       const ri=isF(e.t)?rangeAt[e.c.id+'|'+e.t+'|'+k]:null;
-      s.innerHTML=`<i class="lg ${e.t}"></i>${esc(e.c.name)} <em>${isF(e.t)?FT[e.t].lbl+' 필드'+(ri&&ri.n>1?' '+rangeTxt(ri.r)+' ('+ri.n+'일)':''):e.t==='agm'?'주주총회':'Audit Lobby · '+(e.c.signoff?'Sign-off 완료':'Sign-off 전')}</em>`;
+      s.innerHTML=`<i class="lg ${e.t}"></i><span>${esc(e.c.name)} <em>${isF(e.t)?FT[e.t].lbl+' 필드'+(ri&&ri.n>1?' '+rangeTxt(ri.r)+' ('+ri.n+'일)':''):evDesc(e)}</em></span>`;
       s.onclick=()=>openDay(k,comps);
       it.appendChild(s);
     });
@@ -1180,7 +1357,8 @@ function openDay(k,comps){
       const l=document.createElement('div'); l.className='day-ev';
       ev.forEach(e=>{
         const r=document.createElement('div'); r.className='de-row';
-        r.innerHTML=`<i class="lg ${e.t}"></i><b>${esc(e.c.name)}</b><span>${FT[e.t]?FT[e.t].lbl+' 필드':e.t==='agm'?'주주총회':'Audit Lobby · '+(e.c.signoff?'Sign-off 완료':'Sign-off 전')}</span>`;
+        r.innerHTML=`<i class="lg ${e.t}"></i><b>${esc(e.c.name)}</b><span>${FT[e.t]?FT[e.t].lbl+' 필드':evDesc(e)}</span>`;
+        if(e.t==='wp'){const b=document.createElement('button');b.type='button';b.className='btn sm';b.textContent='조서 열기';b.onclick=()=>{closeSheet();ttOpen(e.c,e.p.k)};r.appendChild(b)}
         if(e.t==='lobby'){const b=document.createElement('button');b.type='button';b.className='signbtn';b.setAttribute('aria-pressed',!!e.c.signoff);b.textContent=e.c.signoff?'Sign-off ✓':'Sign-off';b.onclick=()=>{closeSheet();setField(e.c,'signoff',!e.c.signoff,e.c.signoff?`${e.c.name} Sign-off 취소`:`${e.c.name} Sign-off 완료`)};r.appendChild(b)}
         l.appendChild(r);
       });
@@ -1249,6 +1427,7 @@ function openEdit(id){
           <label class="f">주주총회일<input id="eAgm" type="date" value="${esc(c.agm)}"></label>
           <div class="f">Audit lobby<span class="inline">주총 <input id="eOff" type="number" min="0" max="60" inputmode="numeric" value="${esc(c.lobbyOffset)}"> 일 전</span><span id="eLobby" class="mono"></span></div>
         </div>
+        <label class="f">감사 계약일<input id="eCon" type="date" value="${esc(c.contract||'')}"><span class="fine">계약 전후 조서(1000번대) 마감 기준이에요 · 틱앤타이 조서 진행에 쓰여요</span></label>
         <div class="f">중간감사 필드<div class="fld-list" id="eMFld"></div><div class="fld-add"><input type="date" id="eM1" aria-label="중간 필드 시작일"><span>~</span><input type="date" id="eM2" aria-label="중간 필드 종료일"><button type="button" class="btn" id="eMAdd">추가</button></div></div>
         <div class="f">기말감사 필드<div class="fld-list" id="eFld"></div><div class="fld-add"><input type="date" id="eF1" aria-label="기말 필드 시작일"><span>~</span><input type="date" id="eF2" aria-label="기말 필드 종료일"><button type="button" class="btn" id="eFAdd">추가</button></div><span class="fine">주말·공휴일은 빼고 넣어요. 끝나는 날을 비우면 하루만 들어가요.</span></div>
         <label class="f">비고<textarea id="eNote">${esc(c.note)}</textarea></label>
@@ -1299,7 +1478,7 @@ function openEdit(id){
       let t=isNew?c:arr.find(x=>x.id===c.id);
       const wasParent=t.role==='parent';
       Object.assign(t,{name,join,role,parent:role==='sub'?parent:'',confirmOwner:sh.querySelector('#eCO').value.trim(),reportOwner:sh.querySelector('#eRO').value.trim(),
-        agm:sh.querySelector('#eAgm').value,field:c.field,fieldMid:c.fieldMid,lobbyOffset:Number(sh.querySelector('#eOff').value)||0,note:sh.querySelector('#eNote').value.trim()});
+        agm:sh.querySelector('#eAgm').value,contract:sh.querySelector('#eCon').value,field:c.field,fieldMid:c.fieldMid,lobbyOffset:Number(sh.querySelector('#eOff').value)||0,note:sh.querySelector('#eNote').value.trim()});
       if(role==='sub'){const p=arr.find(x=>x.id===parent);if(p&&p.role!=='parent')p.role='parent'}
       if(wasParent&&role!=='parent')arr.forEach(x=>{if(x.role==='sub'&&x.parent===t.id){x.role='none';x.parent=''}});
       if(isNew)arr.push(t);
@@ -1328,7 +1507,7 @@ function openNewYear(y){
     sh.querySelector('#nyCancel').onclick=closeSheet;
     sh.querySelector('#nyGo').onclick=()=>{
       snapshot();
-      state.years[String(y)]=src.map(c=>Object.assign(norm(c),{join:'',confirm:'ready',sep:'todo',con:'todo',agm:'',signoff:false,note:'',field:[],fieldMid:[]}));
+      state.years[String(y)]=src.map(c=>Object.assign(norm(c),{join:'',confirm:'ready',sep:'todo',con:'todo',agm:'',signoff:false,note:'',field:[],fieldMid:[],contract:''}));
       cur=String(y); closeSheet(); commit(`FY${y}을 만들었어요`);
     };
   });
@@ -2067,6 +2246,7 @@ $('exportBtn').onclick=async()=>{
   }catch(e){if(e&&e.code!=='declined')toast('파일을 저장하지 못했어요',false)}
 };
 
+if(EMBED){const h=document.querySelector('header');h.querySelector('h1').textContent='감사 현황';h.insertBefore($('views'),h.querySelector('.status'));h.insertBefore($('years'),h.querySelector('.status'))}
 render();
 initStore();
 setupWidgetSetting();
