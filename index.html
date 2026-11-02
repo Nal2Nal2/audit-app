@@ -524,7 +524,7 @@ try{cur=localStorage.getItem(UI_KEY)}catch(e){}
 
 const yearsSorted=()=>Object.keys(state.years).sort();
 const list=()=>state.years[cur]||[];
-function blank(name){return {id:uid(),name:name||'',join:'',confirmOwner:'',confirm:'ready',reportOwner:'',sep:'todo',con:'todo',role:'none',parent:'',agm:'',lobbyOffset:state.settings.lobbyDays,signoff:false,note:'',field:[],fieldMid:[],contract:''}}
+function blank(name){return {id:uid(),name:name||'',join:'',confirmOwner:'',confirm:'ready',reportOwner:'',sep:'todo',con:'todo',role:'none',parent:'',agm:'',lobbyOffset:state.settings.lobbyDays,signoff:false,note:'',field:[],fieldMid:[]}}
 function norm(c){const b=blank();return Object.assign(b,c||{})}
 
 /* dates */
@@ -729,7 +729,7 @@ function ttState(){
   return {type:'tt-state',fy:cur||'',years:yearsSorted(),user:SY.user?SY.user.email||'':'',loggedIn:!!SY.user,
     widget:widgetData(),conf:{total:its.length,rep:its.filter(it=>it.rep).length,mailed:its.filter(it=>!it.online).length,dlv:its.filter(it=>it.dlv).length},
     companies:list().map(c=>({id:c.id,name:c.name,join:c.join,role:c.role,parent:c.parent,confirmOwner:c.confirmOwner,reportOwner:c.reportOwner,
-      confirm:c.confirm,sep:c.sep,con:c.con,signoff:!!c.signoff,agm:c.agm,lobby:lobbyOf(c),contract:c.contract||'',
+      confirm:c.confirm,sep:c.sep,con:c.con,signoff:!!c.signoff,agm:c.agm,lobby:lobbyOf(c),
       field:fieldRanges(c.field).map(r=>[r[0],r[1]]),fieldMid:fieldRanges(c.fieldMid).map(r=>[r[0],r[1]])}))};
 }
 function ttSync(force){
@@ -1013,7 +1013,7 @@ function renderWide(m,L){
   const rows=flt?ordered(shown):[...ordered(inn),...ordered(und)];
   const box=document.createElement('section'); box.className='tt-card';
   box.innerHTML=`<div class="tt-ch"><b>${flt?esc(FILTERS[flt].miss)+' '+shown.length+'곳':'회사 '+(inn.length+und.length)+'곳'}</b>${flt?'<button type="button" class="linkbtn" id="ttAll">전체 보기</button>':''}<span class="fine">이름을 누르면 정보 편집 · 상태 칸을 누르면 바로 바꿔요</span><span style="flex:1"></span><span class="tt-lg"><i class="p"></i>진행 <i class="d"></i>완료 <i class="l"></i>마감 지남</span><button type="button" class="addbtn" id="ttAdd">+ 회사 추가</button></div>
-    <div class="tt-tw"><table class="tt-t"><thead><tr><th>회사</th><th>담당</th><th>계약</th><th>중간 필드</th><th>기말 필드</th><th>주총 · Lobby</th><th>조회서</th><th>별도</th><th>연결</th><th>Sign-off</th><th>조서 진행 <span class="fine">계약 · 중간전 · 중간 · 기말</span></th></tr></thead><tbody></tbody></table></div>`;
+    <div class="tt-tw"><table class="tt-t"><thead><tr><th>회사</th><th>담당</th><th>중간 필드</th><th>기말 필드</th><th>주총 · Lobby</th><th>조회서</th><th>별도</th><th>연결</th><th>Sign-off</th><th>조서 진행 <span class="fine">중간전 · 중간 · 기말</span></th></tr></thead><tbody></tbody></table></div>`;
   const tb=box.querySelector('tbody');
   const rg=arr=>{const r=fieldRanges(arr);return r.length?r.map(rangeTxt).join(', '):'<span class="wp-none">—</span>'};
   rows.forEach(c=>{
@@ -1023,7 +1023,7 @@ function renderWide(m,L){
     const lob=lobbyOf(c);
     const pill=(arr,key)=>{const [,nm,tone]=lookup(arr,c[key]);return `<button type="button" class="pill ${tone}" data-st="${key}">${nm}</button>`};
     tr.innerHTML=`<td><button type="button" class="tt-nm" data-ed="1">${esc(c.name)}</button>${c.role==='parent'?'<span class="tag">연결</span>':''}${c.join===''?'<span class="tag q">미정</span>':''}</td>
-      <td class="fine">${esc(ownT)}</td><td class="mono">${c.contract?md(c.contract):'<span class="wp-none">—</span>'}</td>
+      <td class="fine">${esc(ownT)}</td>
       <td class="mono">${rg(c.fieldMid)}</td><td class="mono">${rg(c.field)}</td>
       <td class="mono">${c.agm?md(c.agm)+(lob?` · <span class="fine">${md(lob)}</span>`:''):'<span class="wp-none">—</span>'}</td>
       <td>${pill(CONFIRM,'confirm')}</td><td>${pill(REPORT,'sep')}</td><td>${c.role==='parent'?pill(REPORT,'con'):'<span class="wp-none">—</span>'}</td>
@@ -1035,7 +1035,7 @@ function renderWide(m,L){
     const go=tr.querySelector('[data-wp]'); if(go)go.onclick=()=>ttOpen(c);
     tb.appendChild(tr);
   });
-  if(!rows.length)tb.innerHTML=`<tr><td colspan="11" class="fine" style="text-align:center;padding:20px">${flt?'다 끝났어요':'참여하는 회사가 없어요'}</td></tr>`;
+  if(!rows.length)tb.innerHTML=`<tr><td colspan="10" class="fine" style="text-align:center;padding:20px">${flt?'다 끝났어요':'참여하는 회사가 없어요'}</td></tr>`;
   box.querySelector('#ttAdd').onclick=()=>openEdit(null);
   const all=box.querySelector('#ttAll'); if(all)all.onclick=()=>{flt=null;renderMain()};
   m.appendChild(box);
@@ -1227,7 +1227,6 @@ function calEvents(comps){
   comps.forEach(c=>{
     FTYPES.forEach(t=>(c[FT[t].key]||[]).forEach(k=>push(k,{t,c})));
     if(c.agm){push(c.agm,{t:'agm',c});const l=lobbyOf(c);if(l)push(l,{t:'lobby',c})}
-    if(c.contract)push(c.contract,{t:'contract',c});
     if(EMBED&&WP[c.id])(WP[c.id].phases||[]).forEach(p=>{if(p.due&&p.total)push(p.due,{t:'wp',c,p})});
   });
   const rank={contract:0,wp:1,lobby:2,agm:3,mid:4,field:5};
@@ -1249,7 +1248,7 @@ function renderCalendar(m,comps){
   const {y,m:mo}=calView;
   const box=document.createElement('section'); box.className='calbox';
   box.innerHTML=`<div class="cal-head"><h2 class="mono">${y}. ${pad(mo)}</h2><div class="nav"><button type="button" class="cprev" aria-label="이전 달">‹</button><button type="button" class="ctoday">오늘</button><button type="button" class="cnext" aria-label="다음 달">›</button></div></div>
-    <div class="legend"><span><i class="lg mid"></i>중간 필드</span><span><i class="lg field"></i>기말 필드</span><span><i class="lg lobby"></i>Audit Lobby</span><span><i class="lg agm"></i>주총</span>${EMBED?'<span><i class="lg contract"></i>계약</span><span><i class="lg wp"></i>조서 마감</span>':''}</div>
+    <div class="legend"><span><i class="lg mid"></i>중간 필드</span><span><i class="lg field"></i>기말 필드</span><span><i class="lg lobby"></i>Audit Lobby</span><span><i class="lg agm"></i>주총</span>${EMBED?'<span><i class="lg wp"></i>조서 마감</span>':''}</div>
     <div class="cgrid"></div><p class="fine">날짜를 누르면 그날 일정을 보고 필드를 추가할 수 있어요. 여러 날은 시작일을 꾹 누른 채 끝나는 날까지 끌어 주세요.</p>`;
   box.querySelector('.cprev').onclick=()=>{calView.m--;if(calView.m<1){calView.m=12;calView.y--}renderMain()};
   box.querySelector('.cnext').onclick=()=>{calView.m++;if(calView.m>12){calView.m=1;calView.y++}renderMain()};
@@ -1433,7 +1432,6 @@ function openEdit(id){
           <label class="f">주주총회일<input id="eAgm" type="date" value="${esc(c.agm)}"></label>
           <div class="f">Audit lobby<span class="inline">주총 <input id="eOff" type="number" min="0" max="60" inputmode="numeric" value="${esc(c.lobbyOffset)}"> 일 전</span><span id="eLobby" class="mono"></span></div>
         </div>
-        <label class="f">감사 계약일<input id="eCon" type="date" value="${esc(c.contract||'')}"><span class="fine">계약 전후 조서(1000번대) 마감 기준이에요 · 틱앤타이 조서 진행에 쓰여요</span></label>
         <div class="f">중간감사 필드<div class="fld-list" id="eMFld"></div><div class="fld-add"><input type="date" id="eM1" aria-label="중간 필드 시작일"><span>~</span><input type="date" id="eM2" aria-label="중간 필드 종료일"><button type="button" class="btn" id="eMAdd">추가</button></div></div>
         <div class="f">기말감사 필드<div class="fld-list" id="eFld"></div><div class="fld-add"><input type="date" id="eF1" aria-label="기말 필드 시작일"><span>~</span><input type="date" id="eF2" aria-label="기말 필드 종료일"><button type="button" class="btn" id="eFAdd">추가</button></div><span class="fine">주말·공휴일은 빼고 넣어요. 끝나는 날을 비우면 하루만 들어가요.</span></div>
         <label class="f">비고<textarea id="eNote">${esc(c.note)}</textarea></label>
@@ -1484,7 +1482,7 @@ function openEdit(id){
       let t=isNew?c:arr.find(x=>x.id===c.id);
       const wasParent=t.role==='parent';
       Object.assign(t,{name,join,role,parent:role==='sub'?parent:'',confirmOwner:sh.querySelector('#eCO').value.trim(),reportOwner:sh.querySelector('#eRO').value.trim(),
-        agm:sh.querySelector('#eAgm').value,contract:sh.querySelector('#eCon').value,field:c.field,fieldMid:c.fieldMid,lobbyOffset:Number(sh.querySelector('#eOff').value)||0,note:sh.querySelector('#eNote').value.trim()});
+        agm:sh.querySelector('#eAgm').value,field:c.field,fieldMid:c.fieldMid,lobbyOffset:Number(sh.querySelector('#eOff').value)||0,note:sh.querySelector('#eNote').value.trim()});
       if(role==='sub'){const p=arr.find(x=>x.id===parent);if(p&&p.role!=='parent')p.role='parent'}
       if(wasParent&&role!=='parent')arr.forEach(x=>{if(x.role==='sub'&&x.parent===t.id){x.role='none';x.parent=''}});
       if(isNew)arr.push(t);
@@ -1513,7 +1511,7 @@ function openNewYear(y){
     sh.querySelector('#nyCancel').onclick=closeSheet;
     sh.querySelector('#nyGo').onclick=()=>{
       snapshot();
-      state.years[String(y)]=src.map(c=>Object.assign(norm(c),{join:'',confirm:'ready',sep:'todo',con:'todo',agm:'',signoff:false,note:'',field:[],fieldMid:[],contract:''}));
+      state.years[String(y)]=src.map(c=>Object.assign(norm(c),{join:'',confirm:'ready',sep:'todo',con:'todo',agm:'',signoff:false,note:'',field:[],fieldMid:[]}));
       cur=String(y); closeSheet(); commit(`FY${y}을 만들었어요`);
     };
   });
